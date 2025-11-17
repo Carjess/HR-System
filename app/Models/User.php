@@ -1,0 +1,105 @@
+<?php
+
+namespace App\Models;
+
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use App\Models\Position;
+use App\Models\Contract;
+use App\Models\Timesheet;
+use App\Models\LeaveRequest;
+use App\Models\Payslip;
+use App\Models\EmployeeSchedule;
+
+class User extends Authenticatable
+{
+
+    /** @use HasFactory<\Database\Factories\UserFactory> */
+    use HasFactory, Notifiable;
+
+    public function position()
+    {
+        // Un empleado pertenece a un puesto
+        return $this->belongsTo(Position::class);
+    }
+    public function contracts()
+    {
+        // Un empleado TIENE MUCHOS contratos (historial)
+        return $this->hasMany(Contract::class, 'employee_id');
+    }
+
+    /**
+     * Obtener las hojas de horas del empleado.
+     */
+    public function timesheets()
+    {
+        // Un empleado TIENE MUCHAS hojas de horas
+        return $this->hasMany(Timesheet::class, 'employee_id');
+    }
+
+    /**
+     * Obtener las solicitudes de ausencia del empleado.
+     */
+    public function leaveRequests()
+    {
+        // Un empleado TIENE MUCHAS solicitudes
+        return $this->hasMany(LeaveRequest::class, 'employee_id');
+    }
+
+    /**
+     * Obtener las nóminas del empleado.
+     */
+    public function payslips()
+    {
+        // Un empleado TIENE MUCHAS nóminas
+        return $this->hasMany(Payslip::class, 'employee_id');
+    }
+
+    /**
+     * Obtener los horarios asignados del empleado.
+     */
+    public function schedules()
+    {
+        // Un empleado TIENE MUCHOS horarios
+        return $this->hasMany(EmployeeSchedule::class, 'employee_id');
+    }
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'telefono',
+        'direccion',
+        'fecha_contratacion',
+        'position_id',
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var list<string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+}
