@@ -7,24 +7,57 @@ use Illuminate\Http\Request;
 use App\Models\Position;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use App\Models\Department;
 
 class EmployeeController extends Controller
 {
+
     /**
-     * Display a listing of the resource.
+     * Muestra una lista paginada y filtrable de empleados.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $empleados = User::with('position')->get();
-        return view('empleados.index', compact('empleados'));
+        // 1. Empezamos la consulta, cargando las relaciones que usaremos
+        $query = User::with('position.department');
+
+        // 2. Aplicamos el filtro de búsqueda (si existe)
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%')
+                  ->orWhere('email', 'like', '%' . $request->search . '%');
+        }
+
+        // 3. Aplicamos el filtro de departamento (si existe)
+        // Usamos 'whereHas' para filtrar por una relación
+        if ($request->filled('department_id')) {
+            $query->whereHas('position', function ($q) use ($request) {
+                $q->where('department_id', $request->department_id);
+            });
+        }
+        
+        // 4. Paginamos los resultados
+        //    Obtenemos 5 empleados por página.
+        //    'latest' los ordena por fecha de creación.
+        $empleados = $query->latest('created_at')->paginate(5);
+
+        // 5. Obtenemos todos los departamentos para el menú del filtro
+        $departments = Department::orderBy('name')->get();
+
+        // 6. Devolvemos la vista con todos los datos
+        return view('empleados.index', [
+            'empleados' => $empleados,
+            'departments' => $departments,
+            'filters' => $request->only(['search', 'department_id']) // Para recordar qué se buscó
+        ]);
     }
+        
+    // --- AQUÍ ESTABA LA FUNCIÓN 'index()' DUPLICADA (YA LA ELIMINÉ) ---
 
     /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
-            // 1. Buscamos todos los puestos en la BD
+        // 1. Buscamos todos los puestos en la BD
         $posiciones = Position::all();
 
         // 2. Devolvemos la vista (que crearemos ahora) y le pasamos la lista de puestos
@@ -37,28 +70,28 @@ class EmployeeController extends Controller
     public function store(Request $request)
     {
         // 1. Validación (simple por ahora)
-    // Si falla, Laravel automáticamente regresa al formulario
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|unique:users,email', // 'unique:users' asegura que el email no exista ya
-        'password' => 'required|string|min:8',
-        'position_id' => 'required|exists:positions,id' // Asegura que el 'id' del puesto exista
-    ]);
+        // Si falla, Laravel automáticamente regresa al formulario
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email', // 'unique:users' asegura que el email no exista ya
+            'password' => 'required|string|min:8',
+            'position_id' => 'required|exists:positions,id' // Asegura que el 'id' del puesto exista
+        ]);
 
-    // 2. Crear el Empleado (User)
-    User::create([
-        'name' => $request->name,
-        'email' => $request->email,
-        'password' => Hash::make($request->password), // ¡Importante! Encriptar la contraseña
-        'telefono' => $request->telefono,
-        'direccion' => $request->direccion,
-        'fecha_contratacion' => $request->fecha_contratacion,
-        'position_id' => $request->position_id,
-    ]);
+        // 2. Crear el Empleado (User)
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password), // ¡Importante! Encriptar la contraseña
+            'telefono' => $request->telefono,
+            'direccion' => $request->direccion,
+            'fecha_contratacion' => $request->fecha_contratacion,
+            'position_id' => $request->position_id,
+        ]);
 
-    // 3. Redireccionar de vuelta a la lista
-    // 'with' añade un mensaje de éxito temporal
-    return redirect()->route('empleados.index')->with('status', 'Empleado creado exitosamente.');
+        // 3. Redireccionar de vuelta a la lista
+        // 'with' añade un mensaje de éxito temporal
+        return redirect()->route('empleados.index')->with('status', 'Empleado creado exitosamente.');
     }
 
     /**
@@ -92,33 +125,33 @@ class EmployeeController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, User $empleado)
-{
-    // 1. Validación
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => [
-            'required',
-            'email',
-            // Esta regla 'unique' ignora el email del empleado actual
-            Rule::unique('users')->ignore($empleado->id),
-        ],
-        'password' => 'nullable|string|min:8', // 'nullable' lo hace opcional
-        'position_id' => 'required|exists:positions,id'
-    ]);
+    {
+        // 1. Validación
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => [
+                'required',
+                'email',
+                // Esta regla 'unique' ignora el email del empleado actual
+                Rule::unique('users')->ignore($empleado->id),
+            ],
+            'password' => 'nullable|string|min:8', // 'nullable' lo hace opcional
+            'position_id' => 'required|exists:positions,id'
+        ]);
 
-    // 2. Preparar los datos
-    $data = $request->only('name', 'email', 'telefono', 'direccion', 'fecha_contratacion', 'position_id');
+        // 2. Preparar los datos
+        $data = $request->only('name', 'email', 'telefono', 'direccion', 'fecha_contratacion', 'position_id');
 
-    // 3. Actualizar la contraseña SÓLO SI se escribió una nueva
-    if ($request->filled('password')) {
-        $data['password'] = Hash::make($request->password);
-    }
+        // 3. Actualizar la contraseña SÓLO SI se escribió una nueva
+        if ($request->filled('password')) {
+            $data['password'] = Hash::make($request->password);
+        }
 
-    // 4. Guardar los cambios en el empleado
-    $empleado->update($data);
+        // 4. Guardar los cambios en el empleado
+        $empleado->update($data);
 
-    // 5. Redireccionar de vuelta a la lista con un mensaje
-    return redirect()->route('empleados.index')->with('status', 'Empleado actualizado exitosamente.');
+        // 5. Redireccionar de vuelta a la lista con un mensaje
+        return redirect()->route('empleados.index')->with('status', 'Empleado actualizado exitosamente.');
     }
 
     /**
