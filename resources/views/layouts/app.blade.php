@@ -14,24 +14,13 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-        <!-- 
-            SOLUCIÓN AL PARPADEO: Estilo para x-cloak.
-            Oculta los elementos hasta que Alpine esté listo.
-        -->
+        <!-- Estilo para x-cloak (evita parpadeo al cargar Alpine) -->
         <style>
             [x-cloak] { display: none !important; }
         </style>
     </head>
     
-    <!-- 
-      LÓGICA DE PERSISTENCIA Y ANTI-PARPADEO:
-      1. x-data: Inicializa 'sidebarOpen' leyendo del localStorage.
-      2. isSidebarReady: Empieza en false para evitar animaciones al cargar.
-      3. x-init: 
-         - Observa cambios en sidebarOpen para guardarlos.
-         - Espera 300ms para poner isSidebarReady en true (activando las animaciones).
-    -->
-    <body class="font-sans antialiased bg-gray-100 dark:bg-gray-900" 
+    <body class="font-sans antialiased bg-gray-50 dark:bg-gray-900" 
           x-data="{ 
               sidebarOpen: localStorage.getItem('sidebarOpen') ? localStorage.getItem('sidebarOpen') === 'true' : true,
               isSidebarReady: false
@@ -41,41 +30,40 @@
         <div class="flex h-screen overflow-hidden">
             
             <!-- 1. BARRA LATERAL -->
-            <!-- Se incluye desde navigation.blade.php y reaccionará a la variable sidebarOpen -->
             @include('layouts.navigation')
 
-            <!-- 2. ÁREA PRINCIPAL (Derecha) -->
+            <!-- 2. ÁREA PRINCIPAL -->
             <div class="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
                 
                 <!-- HEADER SUPERIOR -->
-                <header class="flex items-center justify-between px-6 py-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm z-10">
+                <!-- Ajustado a py-3 y sin border-b para eliminar la línea divisoria -->
+                <header class="flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-800 shadow-sm z-10 sticky top-0">
                     
-                    <!-- Botón Móvil (Solo visible en pantallas pequeñas para abrir el menú) -->
+                    <!-- Botón Móvil -->
                     <button @click="sidebarOpen = !sidebarOpen" class="text-gray-500 focus:outline-none lg:hidden">
                         <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M4 6H20M4 12H20M4 18H11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </button>
                     
-                    <!-- Título de la Página (Opcional) -->
+                    <!-- Título -->
                     <div class="flex-1 ml-4 text-lg font-semibold text-gray-800 dark:text-gray-200">
                         {{ $header ?? '' }}
                     </div>
 
-                    <!-- Perfil de Usuario -->
+                    <!-- Perfil -->
                     <div class="flex items-center">
                         <x-dropdown align="right" width="48">
                             <x-slot name="trigger">
                                 <button class="flex items-center text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition duration-150 ease-in-out">
-                                    <!-- Avatar Circular con Inicial -->
-                                    <div class="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                                    <!-- Avatar con Inicial -->
+                                    <div class="h-9 w-9 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
                                         {{ substr(Auth::user()->name, 0, 1) }}
                                     </div>
                                 </button>
                             </x-slot>
 
                             <x-slot name="content">
-                                <!-- Info del Usuario -->
                                 <div class="px-4 py-2 border-b dark:border-gray-600">
                                     <p class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ Auth::user()->name }}</p>
                                     <p class="text-xs text-gray-500 dark:text-gray-400">{{ Auth::user()->role === 'admin' ? 'Administrador' : 'Empleado' }}</p>
@@ -85,7 +73,6 @@
                                     {{ __('Ver Perfil') }}
                                 </x-dropdown-link>
 
-                                <!-- Cerrar Sesión -->
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
                                     <x-dropdown-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">
@@ -98,7 +85,8 @@
                 </header>
 
                 <!-- CONTENIDO DE LA PÁGINA -->
-                <main class="flex-1 p-6">
+                <!-- Padding reducido a p-4 para aprovechar el ancho completo -->
+                <main class="flex-1 p-4">
                     {{ $slot }}
                 </main>
                 

@@ -9,22 +9,17 @@ use App\Models\User;
 
 class Position extends Model
 {
-    
-    /** @use HasFactory<\Database\Factories\PositionFactory> */
     use HasFactory;
 
-    public function department()
-{
-    // Un puesto pertenece a un departamento
-    return $this->belongsTo(Department::class);
-}
+    protected $fillable = ['name', 'department_id']; // <-- Importante
 
-/**
- * Obtener los empleados que tienen este puesto.
- */
-public function users()
-{
-    // Un puesto puede tener muchos empleados (users)
-    return $this->hasMany(User::class);
-}
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
+
+    public function users()
+    {
+        return $this->hasMany(User::class);
+    }
 }

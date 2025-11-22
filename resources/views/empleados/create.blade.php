@@ -1,64 +1,102 @@
 <x-app-layout>
-    {{-- Encabezado --}}
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('Añadir Nuevo Empleado') }}
         </h2>
     </x-slot>
 
-    {{-- Contenido --}}
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 dark:text-gray-100">
                     
-                    {{-- Formulario --}}
-                    {{-- AÚN NO HEMOS CREADO 'empleados.store', PERO LO HAREMOS EN EL PRÓXIMO PASO --}}
                     <form method="POST" action="{{ route('empleados.store') }}">
-                        @csrf <div>
-                            <label for="name">Nombre:</label>
-                            <input type="text" name="name" id="name" class="block w-full mt-1" required>
+                        @csrf 
+
+                        <!-- 1. Información Personal -->
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4 border-b pb-2 dark:border-gray-700">Datos Personales</h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <!-- Nombre -->
+                            <div>
+                                <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nombre Completo</label>
+                                <!-- Validación JS: Solo letras y espacios -->
+                                <input type="text" name="name" id="name" 
+                                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" 
+                                       value="{{ old('name') }}" 
+                                       oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '')"
+                                       required autofocus>
+                                @error('name') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                            </div>
+
+                            <!-- Email -->
+                            <div>
+                                <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Correo Electrónico</label>
+                                <input type="email" name="email" id="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" value="{{ old('email') }}" required>
+                                @error('email') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                            </div>
+
+                            <!-- Teléfono -->
+                            <div>
+                                <label for="telefono" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Teléfono (Solo números)</label>
+                                <!-- Validación JS: Solo números, máx 15 -->
+                                <input type="tel" name="telefono" id="telefono" 
+                                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" 
+                                       value="{{ old('telefono') }}"
+                                       maxlength="15"
+                                       oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                @error('telefono') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                            </div>
+
+                            <!-- Dirección -->
+                            <div>
+                                <label for="direccion" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Dirección</label>
+                                <input type="text" name="direccion" id="direccion" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" value="{{ old('direccion') }}">
+                            </div>
                         </div>
 
-                        <div class="mt-4">
-                            <label for="email">Email:</label>
-                            <input type="email" name="email" id="email" class="block w-full mt-1" required>
+                        <!-- 2. Información Laboral (Selects Dinámicos) -->
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4 border-b pb-2 dark:border-gray-700">Información Laboral</h3>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <!-- Fecha de Contratación -->
+                            <div>
+                                <label for="fecha_contratacion" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Fecha de Ingreso</label>
+                                <input type="date" name="fecha_contratacion" id="fecha_contratacion" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ old('fecha_contratacion', date('Y-m-d')) }}">
+                            </div>
+
+                            <!-- SELECT DEPARTAMENTO -->
+                            <div>
+                                <label for="department_id" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Departamento</label>
+                                <select id="department_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
+                                    <option value="">-- Selecciona un Departamento --</option>
+                                    @foreach ($departments as $dept)
+                                        <option value="{{ $dept->id }}">{{ $dept->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <!-- SELECT CARGO (Se llena con JS) -->
+                            <div>
+                                <label for="position_id" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Cargo / Puesto</label>
+                                <select name="position_id" id="position_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" disabled>
+                                    <option value="">-- Primero selecciona un Departamento --</option>
+                                </select>
+                                @error('position_id') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                            </div>
                         </div>
 
-                        <div class="mt-4">
-                            <label for="password">Contraseña:</label>
-                            <input type="password" name="password" id="password" class="block w-full mt-1" required>
+                        <!-- Seguridad -->
+                        <div class="mb-6">
+                            <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Contraseña Inicial</label>
+                            <input type="password" name="password" id="password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                            @error('password') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
                         </div>
 
-                        <div class="mt-4">
-                            <label for="telefono">Teléfono:</label>
-                            <input type="text" name="telefono" id="telefono" class="block w-full mt-1">
-                        </div>
-
-                        <div class="mt-4">
-                            <label for="direccion">Dirección:</label>
-                            <input type="text" name="direccion" id="direccion" class="block w-full mt-1">
-                        </div>
-
-                        <div class="mt-4">
-                            <label for="fecha_contratacion">Fecha de Contratación:</label>
-                            <input type="date" name="fecha_contratacion" id="fecha_contratacion" class="block w-full mt-1">
-                        </div>
-
-                        <div class="mt-4">
-                            <label for="position_id">Puesto:</label>
-                            <select name="position_id" id="position_id" class="block w-full mt-1">
-                                <option value="">Selecciona un puesto</option>
-                                {{-- Aquí usamos la variable $posiciones que pasamos desde el controlador --}}
-                                @foreach ($posiciones as $posicion)
-                                    <option value="{{ $posicion->id }}">{{ $posicion->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="mt-6">
-                            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                                Guardar Empleado
+                        <div class="flex justify-end">
+                            <a href="{{ route('empleados.index') }}" class="text-gray-600 dark:text-gray-400 hover:underline mr-4 flex items-center">Cancelar</a>
+                            <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+                                Registrar Empleado
                             </button>
                         </div>
                     </form>
@@ -67,4 +105,45 @@
             </div>
         </div>
     </div>
+
+    <!-- SCRIPT PARA CARGAR LOS CARGOS DINÁMICAMENTE -->
+    <script>
+        document.getElementById('department_id').addEventListener('change', function() {
+            var departmentId = this.value;
+            var positionSelect = document.getElementById('position_id');
+
+            // Reiniciar el select de cargos
+            positionSelect.innerHTML = '<option value="">Cargando...</option>';
+            positionSelect.disabled = true;
+
+            if (departmentId) {
+                // Petición a la API que creamos
+                fetch('/api/departamentos/' + departmentId + '/cargos')
+                    .then(response => response.json())
+                    .then(data => {
+                        positionSelect.innerHTML = '<option value="">-- Selecciona un Cargo --</option>';
+                        
+                        if(data.length > 0){
+                            data.forEach(position => {
+                                var option = document.createElement('option');
+                                option.value = position.id;
+                                option.text = position.name;
+                                positionSelect.appendChild(option);
+                            });
+                            positionSelect.disabled = false; // Habilitar si hay cargos
+                        } else {
+                            positionSelect.innerHTML = '<option value="">No hay cargos en este departamento</option>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        positionSelect.innerHTML = '<option value="">Error al cargar</option>';
+                    });
+            } else {
+                positionSelect.innerHTML = '<option value="">-- Primero selecciona un Departamento --</option>';
+                positionSelect.disabled = true;
+            }
+        });
+    </script>
+
 </x-app-layout>

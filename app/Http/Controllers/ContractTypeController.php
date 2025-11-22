@@ -3,74 +3,78 @@
 namespace App\Http\Controllers;
 
 use App\Models\ContractType;
-use Illuminate\Http\Request; // <-- ¡Asegúrate de que este 'use' esté!
+use App\Models\Department;
+use App\Models\Position;
+use Illuminate\Http\Request;
 
 class ContractTypeController extends Controller
 {
-    /**
-     * Muestra una lista paginada y filtrable de tipos de contrato.
-     */
     public function index(Request $request)
     {
-        $query = ContractType::query();
+        // Cargamos departamento y cargo para mostrar en la lista
+        // También cargamos todos los departamentos para el modal de "Crear" en la vista index
+        $query = ContractType::with(['department', 'position']);
 
-        // 1. Aplicamos el filtro de búsqueda (si existe)
         if ($request->filled('search')) {
             $query->where('name', 'like', '%' . $request->search . '%');
         }
         
-        // 2. Paginamos los resultados (5 por página)
         $tipos = $query->latest('created_at')->paginate(5);
+        
+        // Necesitamos los departamentos para el select del modal de crear
+        $departments = Department::orderBy('name')->get();
 
-        // 3. Devolvemos la vista con los datos
         return view('contract_types.index', [
             'tipos' => $tipos,
-            'filters' => $request->only(['search']) // Para recordar qué se buscó
+            'departments' => $departments,
+            'filters' => $request->only(['search'])
         ]);
     }
 
-    /**
-     * Muestra el formulario de creación
-     */
+    // create() y edit() ya no se usarán porque usaremos modales en el index, 
+    // pero los mantenemos por compatibilidad con la ruta resource.
     public function create()
     {
-        return view('contract_types.create');
+        $departments = Department::orderBy('name')->get();
+        return view('contract_types.create', compact('departments'));
     }
 
-    /**
-     * Guarda el nuevo tipo
-     */
+    public function edit(ContractType $tiposContrato)
+    {
+        $departments = Department::orderBy('name')->get();
+        return view('contract_types.edit', compact('tiposContrato', 'departments'));
+    }
+
     public function store(Request $request)
     {
-        $request->validate(['name' => 'required|string|unique:contract_types,name']);
+        $request->validate([
+            'name' => 'required|string|max:255|unique:contract_types,name',
+            'salary' => 'required|numeric|min:0',
+            'department_id' => 'nullable|exists:departments,id',
+            'position_id' => 'nullable|exists:positions,id', // Validamos cargo
+            'description' => 'nullable|string|max:1000',
+        ]);
         
         ContractType::create($request->all()); 
         
-        return redirect()->route('tipos-contrato.index')->with('status', 'Tipo de contrato creado.');
+        return redirect()->route('tipos-contrato.index')->with('status', 'Tipo de contrato creado exitosamente.');
     }
 
-    /**
-     * Muestra el formulario de edición
-     */
-    public function edit(ContractType $tiposContrato)
-    {
-        // Gracias a Route::resource, Laravel pasa el objeto completo
-        return view('contract_types.edit', compact('tiposContrato'));
-    }
-
-    /**
-     * Actualiza el tipo
-     */
     public function update(Request $request, ContractType $tiposContrato)
     {
-        $request->validate(['name' => 'required|string|unique:contract_types,name,' . $tiposContrato->id]);
+        $request->validate([
+            'name' => 'required|string|max:255|unique:contract_types,name,' . $tiposContrato->id,
+            'salary' => 'required|numeric|min:0',
+            'department_id' => 'nullable|exists:departments,id',
+            'position_id' => 'nullable|exists:positions,id',
+            'description' => 'nullable|string|max:1000',
+        ]);
+
         $tiposContrato->update($request->all());
-        return redirect()->route('tipos-contrato.index')->with('status', 'Tipo de contrato actualizado.');
+        
+        return redirect()->route('tipos-contrato.index')->with('status', 'Tipo de contrato actualizado exitosamente.');
     }
 
-    /**
-     * Elimina el tipo
-     */
     public function destroy(ContractType $tiposContrato)
     {
         $tiposContrato->delete();

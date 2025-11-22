@@ -5,20 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Contract;
-use App\Models\Department; 
+use App\Models\Department;
+use App\Models\Position; // <-- Asegúrate de que esto esté importado
 
 class ContractType extends Model
 {
     use HasFactory;
 
-    /**
-     * Los atributos que son asignables masivamente.
-     */
     protected $fillable = [
         'name',
-        'description',   // Nuevo campo
-        'salary',        // Nuevo campo (salario base sugerido)
-        'department_id', // Nuevo campo (relación con departamento)
+        'description',
+        'salary',
+        'department_id',
+        'position_id', // <-- Asegúrate de que este campo esté aquí
     ];
 
     /**
@@ -34,7 +33,15 @@ class ContractType extends Model
      */
     public function department()
     {
-        // Un tipo de contrato "pertenece a" un departamento específico
         return $this->belongsTo(Department::class);
+    }
+
+    /**
+     * Obtener el cargo al que pertenece este tipo de contrato.
+     * ESTA ES LA FUNCIÓN QUE FALTABA Y CAUSABA EL ERROR.
+     */
+    public function position()
+    {
+        return $this->belongsTo(Position::class);
     }
 }

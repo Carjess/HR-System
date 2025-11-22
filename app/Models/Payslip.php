@@ -24,6 +24,7 @@ class Payslip extends Model
         'bonuses',
         'deductions',
         'net_pay',
+        'notes',
     ];
     
 }
