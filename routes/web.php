@@ -84,6 +84,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/empleados', [EmployeeController::class, 'store'])->name('empleados.store');
         Route::get('/empleados/{empleado}/editar', [EmployeeController::class, 'edit'])->name('empleados.edit');
         Route::patch('/empleados/{empleado}', [EmployeeController::class, 'update'])->name('empleados.update');
+        Route::post('/empleados/{empleado}/message', [EmployeeController::class, 'sendMessage'])->name('empleados.message');
         Route::delete('/empleados/{empleado}', [EmployeeController::class, 'destroy'])->name('empleados.destroy');
         
         // Configuración (CRUDs)

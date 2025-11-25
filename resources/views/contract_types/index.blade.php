@@ -1,155 +1,216 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+        <h2 class="font-semibold text-2xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('Tipos de Contrato') }}
         </h2>
+        
+        <style>
+            /* Animaciones globales */
+            .btn-anim { transition: all 250ms; }
+            .btn-anim:hover, .btn-anim:focus { box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px; transform: translateY(-2px); }
+            .btn-anim:active { box-shadow: rgba(0, 0, 0, 0.06) 0 2px 4px; transform: translateY(0); }
+
+            .row-card { position: relative; transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
+            .row-card:hover { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); background-color: #f9fafb; z-index: 10; }
+            .dark .row-card:hover { background-color: #374151; }
+
+            input[type="search"]::-webkit-search-decoration,
+            input[type="search"]::-webkit-search-cancel-button,
+            input[type="search"]::-webkit-search-results-button,
+            input[type="search"]::-webkit-search-results-decoration { display: none; }
+        </style>
     </x-slot>
 
     {{-- Inicializamos el estado del modal de creación --}}
-    <div class="py-12" x-data="{ showCreateModal: {{ $errors->any() ? 'true' : 'false' }} }">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+    <div class="" x-data="{ showCreateModal: {{ $errors->hasBag('default') && !$errors->has('id') ? 'true' : 'false' }} }">
+        <div class="w-full">
+            <!-- Contenedor transparente -->
+            <div class="bg-transparent dark:bg-transparent overflow-hidden sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
 
-                    <!-- Mensaje de Éxito -->
                     @if (session('status'))
-                        <div class="mb-4 p-4 bg-green-100 text-green-700 border border-green-300 rounded dark:bg-green-900 dark:text-green-300 dark:border-green-800">
+                        <div class="mb-6 p-4 bg-green-100 text-green-800 text-base border border-green-300 rounded-xl shadow-sm dark:bg-green-900/50 dark:text-green-300 dark:border-green-800">
                             {{ session('status') }}
                         </div>
                     @endif
 
-                    <!-- Controles -->
-                    <div class="gap-4 sm:flex sm:items-center sm:justify-between mb-6">
+                    <!-- Controles Superiores -->
+                    <div class="gap-4 sm:flex sm:items-center sm:justify-between mb-8">
+                        
+                        <!-- Buscador -->
                         <form method="GET" action="{{ route('tipos-contrato.index') }}" class="sm:flex sm:items-center gap-4 w-full sm:w-auto">
-                            <div>
-                                <label for="search" class="sr-only">Buscar</label>
-                                <input type="text" name="search" value="{{ $filters['search'] ?? '' }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" placeholder="Buscar contrato...">
+                            <div class="relative w-full sm:w-96">
+                                <input placeholder="Buscar contrato..." 
+                                       class="input shadow-sm hover:shadow-md focus:shadow-lg focus:border-2 border-gray-300 px-5 py-3 rounded-xl w-full transition-all outline-none dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder-gray-400 font-medium text-base" 
+                                       name="search" 
+                                       type="search" 
+                                       value="{{ $filters['search'] ?? '' }}" />
+                                <svg class="size-6 absolute top-3.5 right-4 text-gray-400 dark:text-gray-500 w-6 h-6 pointer-events-none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" stroke-linejoin="round" stroke-linecap="round"></path></svg>
                             </div>
-                            <button type="submit" class="mt-2 sm:mt-0 w-full sm:w-auto text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">Buscar</button>
+                            <button type="submit" class="btn-anim w-full sm:w-auto text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-semibold rounded-xl text-base px-8 py-3 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 shadow-md">
+                                Buscar
+                            </button>
                         </form>
 
-                        <button @click="showCreateModal = true" class="w-full mt-4 sm:mt-0 sm:w-auto text-center text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5">
-                            Añadir Nuevo Tipo
+                        <!-- Botón Crear -->
+                        <button @click="showCreateModal = true" class="btn-anim w-full mt-4 sm:mt-0 sm:w-auto text-center text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-semibold rounded-xl text-base px-8 py-3 dark:bg-green-600 dark:hover:bg-green-700 focus:outline-none dark:focus:ring-green-800 flex items-center justify-center gap-2 shadow-md">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            Nuevo Tipo
                         </button>
                     </div>
 
-                    <!-- Lista -->
-                    <div class="flow-root">
-                        <div class="divide-y divide-gray-200 dark:divide-gray-700">
-                            @forelse ($tipos as $tipo)
-                                <div x-data="{ showEditModal: false, showDetailModal: false }" class="flex flex-wrap items-center gap-y-4 py-6">
-                                    <!-- Nombre -->
-                                    <dl class="w-1/2 sm:w-1/4 lg:w-auto lg:flex-1">
-                                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Nombre:</dt>
-                                        <dd class="mt-1.5 text-base font-semibold text-gray-900 dark:text-white">{{ $tipo->name }}</dd>
-                                    </dl>
-                                    <!-- Dept -->
-                                    <dl class="w-1/2 sm:w-1/4 lg:w-auto lg:flex-1">
-                                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Departamento:</dt>
-                                        <dd class="mt-1.5 text-sm text-gray-900 dark:text-white">{{ $tipo->department->name ?? 'N/A' }}</dd>
-                                    </dl>
-                                    <!-- Cargo -->
-                                    <dl class="w-1/2 sm:w-1/4 lg:w-auto lg:flex-1">
-                                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Cargo:</dt>
-                                        <dd class="mt-1.5 text-sm text-gray-900 dark:text-white">{{ $tipo->position->name ?? 'General' }}</dd>
-                                    </dl>
-                                    <!-- Salario -->
-                                    <dl class="w-1/2 sm:w-1/4 lg:w-auto lg:flex-1">
-                                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Salario Base:</dt>
-                                        <dd class="mt-1.5 text-sm font-bold text-green-600 dark:text-green-400">${{ number_format($tipo->salary, 2) }}</dd>
-                                    </dl>
+                    <!-- TABLA DE TIPOS DE CONTRATO -->
+                    <div class="overflow-hidden rounded-2xl shadow-md border border-gray-200 dark:border-gray-700"> 
+                        <table class="w-full text-left text-gray-500 dark:text-gray-400">
+                            <thead class="text-sm text-gray-700 uppercase font-bold tracking-wider bg-gray-100 dark:bg-gray-700/50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-4 pl-8">Nombre</th>
+                                    <th scope="col" class="px-6 py-4">Departamento</th>
+                                    <th scope="col" class="px-6 py-4">Cargo</th>
+                                    <th scope="col" class="px-6 py-4">Salario Base</th>
+                                    <th scope="col" class="px-6 py-4 text-right pr-8">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                                @forelse ($tipos as $tipo)
+                                    <!-- Fila Interactiva: Clic abre el modal de EDITAR -->
+                                    <tr class="bg-white dark:bg-gray-800 row-card transition-colors" 
+                                        x-data="{ showEditModal: {{ $errors->has('id') && old('id') == $tipo->id ? 'true' : 'false' }} }"
+                                        @click="showEditModal = true">
+                                        
+                                        <!-- Nombre -->
+                                        <td class="px-6 py-6 pl-8 whitespace-nowrap text-lg font-bold text-gray-900 dark:text-white">
+                                            {{ $tipo->name }}
+                                        </td>
 
-                                    <!-- Acciones -->
-                                    <div class="w-full sm:w-auto flex items-center justify-end gap-3">
-                                        <button @click="showDetailModal = true" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 font-medium text-sm">Ver Detalles</button>
-                                        <button @click="showEditModal = true" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 font-medium text-sm">Editar</button>
-                                        <form method="POST" action="{{ route('tipos-contrato.destroy', $tipo->id) }}" class="inline">
-                                            @csrf @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover:text-red-900 dark:text-red-400 font-medium text-sm" onclick="return confirm('¿Eliminar este tipo?')">Eliminar</button>
-                                        </form>
-                                    </div>
+                                        <!-- Departamento -->
+                                        <td class="px-6 py-6">
+                                            <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-blue-50 text-blue-700 border border-blue-100 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800">
+                                                {{ $tipo->department->name ?? 'General' }}
+                                            </span>
+                                        </td>
 
-                                    <!-- MODAL DETALLES -->
-                                    <div x-show="showDetailModal" style="display: none;" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 backdrop-blur-sm p-4 md:inset-0 h-full">
-                                        <div class="relative w-full max-w-2xl h-auto" @click.away="showDetailModal = false">
-                                            <div class="relative bg-white rounded-lg shadow dark:bg-gray-800 p-6 space-y-4">
-                                                <h3 class="text-xl font-bold text-gray-900 dark:text-white">Detalles del Contrato</h3>
-                                                <div class="grid grid-cols-2 gap-4">
-                                                    <div><p class="text-sm text-gray-500">Nombre</p><p class="font-semibold dark:text-white">{{ $tipo->name }}</p></div>
-                                                    <div><p class="text-sm text-gray-500">Salario</p><p class="font-bold text-green-600">${{ number_format($tipo->salary, 2) }}</p></div>
-                                                    <div><p class="text-sm text-gray-500">Departamento</p><p class="dark:text-white">{{ $tipo->department->name ?? 'N/A' }}</p></div>
-                                                    <div><p class="text-sm text-gray-500">Cargo Específico</p><p class="dark:text-white">{{ $tipo->position->name ?? 'Todos' }}</p></div>
-                                                </div>
-                                                <div>
-                                                    <p class="text-sm text-gray-500 mb-1">Descripción</p>
-                                                    <div class="p-3 bg-gray-50 dark:bg-gray-700 rounded text-sm dark:text-gray-300">{{ $tipo->description ?? 'Sin descripción' }}</div>
-                                                </div>
-                                                <div class="flex justify-end"><button @click="showDetailModal = false" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded">Cerrar</button></div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                        <!-- Cargo -->
+                                        <td class="px-6 py-6">
+                                            <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-purple-50 text-purple-700 border border-purple-100 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800">
+                                                {{ $tipo->position->name ?? 'Todos' }}
+                                            </span>
+                                        </td>
 
-                                    <!-- MODAL EDITAR -->
-                                    <div x-show="showEditModal" style="display: none;" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 backdrop-blur-sm p-4 md:inset-0 h-full">
-                                        <div class="relative w-full max-w-2xl h-auto max-h-full overflow-y-auto" @click.away="showEditModal = false">
-                                            <div class="relative bg-white rounded-lg shadow-xl dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-                                                <div class="flex justify-between p-4 border-b rounded-t dark:border-gray-600 bg-gray-50 dark:bg-gray-900/50">
-                                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Editar: {{ $tipo->name }}</h3>
-                                                    <button @click="showEditModal = false" class="text-gray-400 hover:text-gray-900 dark:hover:text-white"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg></button>
-                                                </div>
-                                                <form method="POST" action="{{ route('tipos-contrato.update', $tipo->id) }}" class="p-6">
-                                                    @csrf @method('PATCH')
-                                                    <div class="mb-4">
-                                                        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nombre</label>
-                                                        <input type="text" name="name" value="{{ old('name', $tipo->name) }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
-                                                    </div>
-                                                    <div class="grid grid-cols-2 gap-4 mb-4">
-                                                        <div>
-                                                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Departamento</label>
-                                                            <select name="department_id" onchange="loadPositions(this.value, 'position_id_{{ $tipo->id }}')" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                                                                <option value="">-- Seleccionar --</option>
-                                                                @foreach ($departments as $dept)
-                                                                    <option value="{{ $dept->id }}" {{ $tipo->department_id == $dept->id ? 'selected' : '' }}>{{ $dept->name }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        </div>
-                                                        <div>
-                                                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Cargo</label>
-                                                            <select name="position_id" id="position_id_{{ $tipo->id }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                                                                @if($tipo->department)
-                                                                    <option value="">-- General / Todos --</option>
-                                                                    @foreach($tipo->department->positions as $pos)
-                                                                        <option value="{{ $pos->id }}" {{ $tipo->position_id == $pos->id ? 'selected' : '' }}>{{ $pos->name }}</option>
-                                                                    @endforeach
-                                                                @else
-                                                                    <option value="">-- Selecciona Dept --</option>
-                                                                @endif
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="mb-4">
-                                                        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Salario Base ($)</label>
-                                                        <input type="number" name="salary" step="0.01" value="{{ old('salary', $tipo->salary) }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
-                                                    </div>
-                                                    <div class="mb-4">
-                                                        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Descripción</label>
-                                                        <textarea name="description" rows="3" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">{{ old('description', $tipo->description) }}</textarea>
-                                                    </div>
-                                                    <div class="flex justify-end space-x-2">
-                                                        <button @click="showEditModal = false" type="button" class="text-gray-500 bg-white border border-gray-200 rounded-lg px-5 py-2.5 hover:text-gray-900">Cancelar</button>
-                                                        <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 rounded-lg px-5 py-2.5">Actualizar</button>
-                                                    </div>
+                                        <!-- Salario -->
+                                        <td class="px-6 py-6 text-base font-bold text-green-600 dark:text-green-400">
+                                            ${{ number_format($tipo->salary, 2) }}
+                                        </td>
+
+                                        <!-- Acciones -->
+                                        <td class="px-6 py-6 text-right pr-8">
+                                            <div class="flex items-center justify-end gap-3">
+                                                <!-- Botón Editar -->
+                                                <button @click.stop="showEditModal = true" class="text-gray-400 hover:text-blue-600 dark:text-gray-500 dark:hover:text-blue-400 p-2.5 rounded-full hover:bg-blue-50 dark:hover:bg-gray-700 transition-all" title="Editar">
+                                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                                </button>
+                                                
+                                                <!-- Botón Eliminar -->
+                                                <form method="POST" action="{{ route('tipos-contrato.destroy', $tipo->id) }}" class="inline">
+                                                    @csrf @method('DELETE')
+                                                    <button type="submit" 
+                                                            onclick="event.stopPropagation(); return confirm('¿Eliminar este tipo de contrato?')" 
+                                                            class="text-gray-400 hover:text-red-600 dark:text-gray-500 dark:hover:text-red-400 p-2.5 rounded-full hover:bg-red-50 dark:hover:bg-gray-700 transition-all" 
+                                                            title="Eliminar">
+                                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                                    </button>
                                                 </form>
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            @empty
-                                <div class="py-6 text-center text-gray-500 dark:text-gray-400">No hay tipos de contrato.</div>
-                            @endforelse
-                        </div>
+
+                                            <!-- MODAL EDITAR (Teleported) -->
+                                            <template x-teleport="body">
+                                                <!-- Al hacer clic en el fondo (fuera del modal), se cierra -->
+                                                <div x-show="showEditModal" style="display: none;" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 backdrop-blur-sm p-4 md:inset-0 h-full" @click="showEditModal = false">
+                                                    
+                                                    <!-- Contenido del modal (click.stop evita que se cierre al hacer clic dentro) -->
+                                                    <div class="relative w-full max-w-2xl h-auto max-h-full overflow-y-auto" @click.stop="">
+                                                        <div class="relative bg-white rounded-xl shadow-2xl dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                                                            
+                                                            <!-- Cabecera -->
+                                                            <div class="flex justify-between p-6 border-b rounded-t-xl dark:border-gray-600 bg-gray-50 dark:bg-gray-900/50">
+                                                                <h3 class="text-xl font-bold text-gray-900 dark:text-white">Editar: {{ $tipo->name }}</h3>
+                                                                <button @click="showEditModal = false" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white transition-colors">
+                                                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                                                                </button>
+                                                            </div>
+
+                                                            <!-- Formulario de Edición -->
+                                                            <form method="POST" action="{{ route('tipos-contrato.update', $tipo->id) }}" class="p-8">
+                                                                @csrf @method('PATCH')
+                                                                <input type="hidden" name="id" value="{{ $tipo->id }}">
+
+                                                                <div class="mb-8">
+                                                                    <label class="block mb-3 text-lg font-medium text-gray-900 dark:text-white">Nombre del Puesto / Contrato</label>
+                                                                    <input type="text" name="name" value="{{ old('name', $tipo->name) }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-lg rounded-xl focus:ring-blue-500 focus:border-blue-500 block w-full p-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white shadow-sm" required>
+                                                                    @if($errors->has('name') && old('id') == $tipo->id) <span class="text-red-600 text-sm">{{ $errors->first('name') }}</span> @endif
+                                                                </div>
+
+                                                                <div class="grid grid-cols-2 gap-8 mb-8">
+                                                                    <div>
+                                                                        <label class="block mb-2 text-base font-medium text-gray-900 dark:text-white">Departamento</label>
+                                                                        <select name="department_id" onchange="loadPositions(this.value, 'position_id_{{ $tipo->id }}')" class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-xl focus:ring-blue-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                                                            <option value="">-- Seleccionar --</option>
+                                                                            @foreach ($departments as $dept)
+                                                                                <option value="{{ $dept->id }}" {{ $tipo->department_id == $dept->id ? 'selected' : '' }}>{{ $dept->name }}</option>
+                                                                            @endforeach
+                                                                        </select>
+                                                                    </div>
+                                                                    <div>
+                                                                        <label class="block mb-2 text-base font-medium text-gray-900 dark:text-white">Cargo</label>
+                                                                        <select name="position_id" id="position_id_{{ $tipo->id }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-xl focus:ring-blue-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                                                            @if($tipo->department)
+                                                                                <option value="">-- General / Todos --</option>
+                                                                                @foreach($tipo->department->positions as $pos)
+                                                                                    <option value="{{ $pos->id }}" {{ $tipo->position_id == $pos->id ? 'selected' : '' }}>{{ $pos->name }}</option>
+                                                                                @endforeach
+                                                                            @else
+                                                                                <option value="">-- Selecciona Dept --</option>
+                                                                            @endif
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="mb-8">
+                                                                    <label class="block mb-3 text-lg font-medium text-gray-900 dark:text-white">Salario Base Mensual ($)</label>
+                                                                    <input type="number" name="salary" step="0.01" value="{{ old('salary', $tipo->salary) }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-lg rounded-xl focus:ring-blue-500 block w-full p-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white shadow-sm" required>
+                                                                </div>
+
+                                                                <div class="mb-8">
+                                                                    <label class="block mb-2 text-base font-medium text-gray-900 dark:text-white">Descripción</label>
+                                                                    <textarea name="description" rows="3" class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-xl focus:ring-blue-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:text-white shadow-sm">{{ old('description', $tipo->description) }}</textarea>
+                                                                </div>
+
+                                                                <div class="flex justify-end space-x-4">
+                                                                    <button @click="showEditModal = false" type="button" class="text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 focus:ring-4 focus:outline-none focus:ring-blue-300 font-semibold rounded-xl text-base px-8 py-3 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 transition-colors">Cancelar</button>
+                                                                    <button type="submit" class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-semibold rounded-xl text-base px-8 py-3 dark:bg-blue-600 dark:hover:bg-blue-700 transition-colors">Actualizar</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="px-6 py-16 text-center text-xl font-medium text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800">
+                                            No se encontraron tipos de contrato.
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="mt-6">{!! $tipos->appends($filters)->links() !!}</div>
+
+                    <!-- Paginación -->
+                    <div class="mt-10">
+                        {!! $tipos->appends($filters)->links() !!}
+                    </div>
                 </div>
             </div>
         </div>
@@ -157,21 +218,27 @@
         <!-- MODAL CREAR -->
         <div x-show="showCreateModal" style="display: none;" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 backdrop-blur-sm p-4 md:inset-0 h-full">
             <div class="relative w-full max-w-2xl h-auto max-h-full overflow-y-auto" @click.away="showCreateModal = false">
-                <div class="relative bg-white rounded-lg shadow-xl dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-                    <div class="flex justify-between p-4 border-b rounded-t dark:border-gray-600 bg-gray-50 dark:bg-gray-900/50">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Crear Nuevo Tipo de Contrato</h3>
-                        <button @click="showCreateModal = false" class="text-gray-400 hover:text-gray-900 dark:hover:text-white"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg></button>
+                <div class="relative bg-white rounded-xl shadow-2xl dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                    
+                    <div class="flex justify-between p-6 border-b rounded-t-xl dark:border-gray-600 bg-gray-50 dark:bg-gray-900/50">
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white">Crear Nuevo Tipo de Contrato</h3>
+                        <button @click="showCreateModal = false" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white transition-colors">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                        </button>
                     </div>
-                    <form method="POST" action="{{ route('tipos-contrato.store') }}" class="p-6">
+
+                    <form method="POST" action="{{ route('tipos-contrato.store') }}" class="p-8">
                         @csrf 
-                        <div class="mb-4">
-                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nombre</label>
-                            <input type="text" name="name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                        <div class="mb-8">
+                            <label class="block mb-3 text-lg font-medium text-gray-900 dark:text-white">Nombre del Puesto / Contrato</label>
+                            <input type="text" name="name" value="{{ old('name') }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-lg rounded-xl focus:ring-blue-500 block w-full p-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white shadow-sm" required autofocus>
+                            @error('name') <span class="text-red-600 text-sm mt-2 block">{{ $message }}</span> @enderror
                         </div>
-                        <div class="grid grid-cols-2 gap-4 mb-4">
+
+                        <div class="grid grid-cols-2 gap-8 mb-8">
                             <div>
-                                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Departamento</label>
-                                <select name="department_id" onchange="loadPositions(this.value, 'create_position_id')" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                <label class="block mb-2 text-base font-medium text-gray-900 dark:text-white">Departamento</label>
+                                <select name="department_id" onchange="loadPositions(this.value, 'create_position_id')" class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-xl focus:ring-blue-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                                     <option value="">-- Seleccionar --</option>
                                     @foreach ($departments as $dept)
                                         <option value="{{ $dept->id }}">{{ $dept->name }}</option>
@@ -179,23 +246,26 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Cargo</label>
-                                <select name="position_id" id="create_position_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" disabled>
+                                <label class="block mb-2 text-base font-medium text-gray-900 dark:text-white">Cargo</label>
+                                <select name="position_id" id="create_position_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-xl focus:ring-blue-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:text-white" disabled>
                                     <option value="">-- Selecciona Dept --</option>
                                 </select>
                             </div>
                         </div>
-                        <div class="mb-4">
-                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Salario Base ($)</label>
-                            <input type="number" name="salary" step="0.01" value="0" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+
+                        <div class="mb-8">
+                            <label class="block mb-3 text-lg font-medium text-gray-900 dark:text-white">Salario Base Mensual ($)</label>
+                            <input type="number" name="salary" step="0.01" value="{{ old('salary', 0) }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-lg rounded-xl focus:ring-blue-500 block w-full p-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white shadow-sm" required>
                         </div>
-                        <div class="mb-4">
-                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Descripción</label>
-                            <textarea name="description" rows="3" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"></textarea>
+
+                        <div class="mb-8">
+                            <label class="block mb-2 text-base font-medium text-gray-900 dark:text-white">Descripción</label>
+                            <textarea name="description" rows="3" class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-xl focus:ring-blue-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:text-white">{{ old('description') }}</textarea>
                         </div>
-                        <div class="flex justify-end space-x-2">
-                            <button @click="showCreateModal = false" type="button" class="text-gray-500 bg-white border border-gray-200 rounded-lg px-5 py-2.5 hover:text-gray-900">Cancelar</button>
-                            <button type="submit" class="text-white bg-green-700 hover:bg-green-800 rounded-lg px-5 py-2.5">Guardar</button>
+
+                        <div class="flex justify-end space-x-4">
+                            <button @click="showCreateModal = false" type="button" class="text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 focus:ring-4 focus:outline-none focus:ring-blue-300 font-semibold rounded-xl text-base px-8 py-3 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 transition-colors">Cancelar</button>
+                            <button type="submit" class="text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-semibold rounded-xl text-base px-8 py-3 dark:bg-green-600 dark:hover:bg-green-700 transition-colors">Guardar</button>
                         </div>
                     </form>
                 </div>

@@ -8,11 +8,15 @@ use App\Models\Position;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use App\Models\Department; 
-use App\Models\ContractType; // <-- Añadido para que funcione el modal
+use App\Models\ContractType;
+use App\Models\Message; // <-- Importante para la función de mensajes
 
 class EmployeeController extends Controller
 {
 
+    /**
+     * Muestra la lista de empleados con filtros y paginación.
+     */
     public function index(Request $request)
     {
         $query = User::with(['position.department.positions']);
@@ -38,12 +42,18 @@ class EmployeeController extends Controller
         ]);
     }
 
+    /**
+     * Muestra el formulario de creación (aunque ahora usamos modal, se mantiene por si acaso).
+     */
     public function create()
     {
         $departments = Department::orderBy('name')->get();
         return view('empleados.create', compact('departments'));
     }
 
+    /**
+     * Guarda un nuevo empleado.
+     */
     public function store(Request $request)
     {
         // 1. Limpieza previa de datos
@@ -51,7 +61,6 @@ class EmployeeController extends Controller
         if (isset($input['telefono'])) {
             $input['telefono'] = preg_replace('/[^0-9]/', '', $input['telefono']);
         }
-
         $request->replace($input);
 
         // 2. Validación
@@ -78,17 +87,23 @@ class EmployeeController extends Controller
         return redirect()->route('empleados.index')->with('status', 'Empleado creado exitosamente.');
     }
 
+    /**
+     * Muestra el perfil del empleado.
+     */
     public function show(User $empleado)
     {
-        // Cargamos relaciones del empleado
+        // Cargamos todas las relaciones necesarias para el perfil
         $empleado->load('contracts.type', 'position', 'timesheets', 'payslips', 'leaveRequests');
         
-        // --- CORRECCIÓN: Volvemos a cargar los tipos de contrato para el modal ---
+        // Cargamos los tipos de contrato para el modal de "Nuevo Contrato"
         $contractTypes = ContractType::all();
 
         return view('empleados.show', compact('empleado', 'contractTypes'));
     }
 
+    /**
+     * Muestra el formulario de edición (usado por el modal en index).
+     */
     public function edit(User $empleado)
     {
         $departments = Department::orderBy('name')->get();
@@ -98,6 +113,9 @@ class EmployeeController extends Controller
         return view('empleados.edit', compact('empleado', 'departments', 'currentDepartmentId', 'positions'));
     }
 
+    /**
+     * Actualiza un empleado existente.
+     */
     public function update(Request $request, User $empleado)
     {
         // 1. Limpieza previa de datos
@@ -133,9 +151,33 @@ class EmployeeController extends Controller
         return redirect()->route('empleados.index')->with('status', 'Empleado actualizado exitosamente.');
     }
 
+    /**
+     * Elimina un empleado.
+     */
     public function destroy(User $empleado)
     {
         $empleado->delete();
         return redirect()->route('empleados.index')->with('status', 'Empleado eliminado exitosamente.');
+    }
+
+    /**
+     * Envía un mensaje interno a un empleado.
+     */
+    public function sendMessage(Request $request, User $empleado)
+    {
+        $request->validate([
+            'subject' => 'required|string|max:255',
+            'message' => 'required|string',
+        ]);
+
+        Message::create([
+            'sender_id' => auth()->id(),      // El admin logueado
+            'receiver_id' => $empleado->id,   // El empleado del perfil
+            'subject' => $request->subject,
+            'body' => $request->message,
+            'allow_reply' => true,            // Por defecto permitimos respuesta
+        ]);
+        
+        return back()->with('status', 'Mensaje enviado correctamente a ' . $empleado->name);
     }
 }
