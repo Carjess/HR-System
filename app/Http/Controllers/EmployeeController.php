@@ -9,7 +9,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use App\Models\Department; 
 use App\Models\ContractType;
-use App\Models\Message; // <-- Importante para la función de mensajes
+use App\Models\Message; 
+use Illuminate\Support\Facades\Auth;
 
 class EmployeeController extends Controller
 {
@@ -92,13 +93,25 @@ class EmployeeController extends Controller
      */
     public function show(User $empleado)
     {
-        // Cargamos todas las relaciones necesarias para el perfil
+        // Cargamos relaciones del empleado
         $empleado->load('contracts.type', 'position', 'timesheets', 'payslips', 'leaveRequests');
         
-        // Cargamos los tipos de contrato para el modal de "Nuevo Contrato"
+        // Cargamos los tipos de contrato para el modal
         $contractTypes = ContractType::all();
 
-        return view('empleados.show', compact('empleado', 'contractTypes'));
+        // --- NUEVO: Cargar historial de chat para el widget flotante ---
+        $messages = Message::where(function($q) use ($empleado) {
+                $q->where('sender_id', Auth::id())
+                  ->where('receiver_id', $empleado->id);
+            })
+            ->orWhere(function($q) use ($empleado) {
+                $q->where('sender_id', $empleado->id)
+                  ->where('receiver_id', Auth::id());
+            })
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        return view('empleados.show', compact('empleado', 'contractTypes', 'messages'));
     }
 
     /**

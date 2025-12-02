@@ -10,6 +10,7 @@ use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\PositionController;
+use App\Http\Controllers\MessageController; 
 
 use App\Models\User;
 use App\Models\Contract;
@@ -84,7 +85,6 @@ Route::middleware('auth')->group(function () {
         Route::post('/empleados', [EmployeeController::class, 'store'])->name('empleados.store');
         Route::get('/empleados/{empleado}/editar', [EmployeeController::class, 'edit'])->name('empleados.edit');
         Route::patch('/empleados/{empleado}', [EmployeeController::class, 'update'])->name('empleados.update');
-        Route::post('/empleados/{empleado}/message', [EmployeeController::class, 'sendMessage'])->name('empleados.message');
         Route::delete('/empleados/{empleado}', [EmployeeController::class, 'destroy'])->name('empleados.destroy');
         
         // Configuración (CRUDs)
@@ -113,10 +113,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/ausencias', [LeaveRequestController::class, 'index'])->name('ausencias.index');
         Route::patch('/ausencias/{leaveRequest}/approve', [LeaveRequestController::class, 'approve'])->name('ausencias.approve');
         Route::patch('/ausencias/{leaveRequest}/reject', [LeaveRequestController::class, 'reject'])->name('ausencias.reject');
+
+        // Enviar mensaje (Solo Admin puede INICIAR la conversación desde el perfil)
+        Route::post('/empleados/{empleado}/message', [EmployeeController::class, 'sendMessage'])->name('empleados.message');
     });
 
     // --- ZONA DE EMPLEADO (Y ADMIN) ---
-    // Ver Perfil Propio (Esta ruta DEBE ir después de /empleados/crear para evitar conflictos)
+    // Ver Perfil Propio
     Route::get('/empleados/{empleado}', [EmployeeController::class, 'show'])->name('empleados.show');
     
     // Acciones de Empleado
@@ -124,6 +127,17 @@ Route::middleware('auth')->group(function () {
     Route::post('/empleados/{empleado}/timesheets', [TimesheetController::class, 'store'])->name('timesheets.store');
     Route::get('/empleados/{empleado}/ausencias/crear', [LeaveRequestController::class, 'create'])->name('ausencias.create');
     Route::post('/empleados/{empleado}/ausencias', [LeaveRequestController::class, 'store'])->name('ausencias.store');
+
+    // --- NUEVAS RUTAS: CHAT INTERNO ---
+    // --- RUTAS DEL CHAT GLOBAL ---
+    Route::post('/chat/open/{user}', [MessageController::class, 'openChat'])->name('chat.open');
+    Route::post('/chat/close', [MessageController::class, 'closeChat'])->name('chat.close');
+    
+    // Ver el chat con un usuario específico
+    Route::get('/chat/{user}', [MessageController::class, 'chat'])->name('messages.chat');
+    // Enviar un mensaje en ese chat
+    Route::post('/chat/{user}', [MessageController::class, 'store'])->name('messages.store');
+
 });
 
 require __DIR__.'/auth.php';

@@ -36,7 +36,6 @@
             <div class="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
                 
                 <!-- HEADER SUPERIOR -->
-                <!-- Ajustado a py-3 y sin border-b para eliminar la línea divisoria -->
                 <header class="flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-800 shadow-sm z-10 sticky top-0">
                     
                     <!-- Botón Móvil -->
@@ -85,12 +84,144 @@
                 </header>
 
                 <!-- CONTENIDO DE LA PÁGINA -->
-                <!-- Padding reducido a p-4 para aprovechar el ancho completo -->
                 <main class="flex-1 p-4">
                     {{ $slot }}
                 </main>
                 
             </div>
         </div>
+
+        <!-- === CHAT GLOBAL === -->
+        <!-- Solo se muestra si el AppServiceProvider inyectó las variables -->
+         @if(isset($globalChatUser))
+            @include('messages.chat', ['empleado' => $globalChatUser, 'messages' => $globalChatMessages])
+        @endif
+
+        <!-- SCRIPT DEL CHAT WIDGET (MOVIDO AQUÍ PARA QUE SEA GLOBAL) -->
+        <script>
+            function chatWidget() {
+                return {
+                    isOpen: true, 
+                    isMinimized: false,
+                    isDragging: false, 
+                    hasMoved: false,
+                    x: 0, y: 0, 
+                    startX: 0, startY: 0,
+                    
+                    init() {
+                        const storedMin = localStorage.getItem('chat_minimized');
+                        const storedX = localStorage.getItem('chat_pos_x');
+                        const storedY = localStorage.getItem('chat_pos_y');
+
+                        this.isMinimized = storedMin === 'true';
+
+                        if (storedX && storedY) {
+                            this.x = parseInt(storedX);
+                            this.y = parseInt(storedY);
+                        } else {
+                            this.x = window.innerWidth - 80; 
+                            this.y = window.innerHeight - 100;
+                        }
+                        
+                        this.snapToEdge();
+                        this.scrollToBottom();
+
+                        this.$watch('isMinimized', (val) => {
+                            localStorage.setItem('chat_minimized', val);
+                        });
+                    },
+
+                    closeGlobalChat() {
+                        this.isOpen = false;
+                        // Eliminar elemento del DOM para evitar conflictos si se vuelve a abrir
+                        setTimeout(() => {
+                            const el = this.$el;
+                            if (el && el.parentNode) el.parentNode.removeChild(el);
+                        }, 300);
+
+                        fetch("{{ route('chat.close') }}", {
+                            method: 'POST',
+                            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'application/json' }
+                        });
+                    },
+
+                    minimize() {
+                        this.isMinimized = true;
+                        setTimeout(() => this.snapToEdge(), 50);
+                    },
+
+                    handleClick() {
+                        if (!this.hasMoved) {
+                            this.isMinimized = false;
+                            setTimeout(() => this.scrollToBottom(), 100);
+                        }
+                    },
+
+                    scrollToBottom() {
+                        setTimeout(() => { 
+                            const c = document.getElementById('chat-history'); 
+                            if(c) c.scrollTop = c.scrollHeight; 
+                        }, 100);
+                    },
+
+                    startDrag(e) {
+                        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                        this.isDragging = false; 
+                        this.hasMoved = false; 
+                        this.startX = clientX - this.x;
+                        this.startY = clientY - this.y;
+                        const move = (e) => this.onMove(e);
+                        const stop = () => this.onStop(move, stop);
+                        document.addEventListener('mousemove', move);
+                        document.addEventListener('touchmove', move);
+                        document.addEventListener('mouseup', stop);
+                        document.addEventListener('touchend', stop);
+                    },
+
+                    onMove(e) {
+                        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                        if (Math.abs(clientX - this.startX - this.x) > 5 || Math.abs(clientY - this.startY - this.y) > 5) {
+                            this.hasMoved = true;
+                            this.isDragging = true; 
+                        }
+                        if (this.isDragging) {
+                            this.x = clientX - this.startX;
+                            this.y = clientY - this.startY;
+                        }
+                    },
+
+                    onStop(moveFn, stopFn) {
+                        document.removeEventListener('mousemove', moveFn);
+                        document.removeEventListener('touchmove', moveFn);
+                        document.removeEventListener('mouseup', stopFn);
+                        document.removeEventListener('touchend', stopFn);
+                        this.isDragging = false;
+                        setTimeout(() => { this.snapToEdge(); }, 20);
+                    },
+
+                    snapToEdge() {
+                        const screenW = window.innerWidth;
+                        const screenH = window.innerHeight;
+                        const widgetW = this.isMinimized ? 64 : 384; 
+                        const widgetH = this.isMinimized ? 64 : 500;
+                        if (this.y < 10) this.y = 10;
+                        if (this.y > screenH - widgetH - 10) this.y = screenH - widgetH - 10;
+                        if (this.isMinimized) {
+                            const midPoint = screenW / 2;
+                            if (this.x + (widgetW/2) < midPoint) this.x = 10; 
+                            else this.x = screenW - widgetW - 10; 
+                        } else {
+                            if (this.x < 10) this.x = 10;
+                            if (this.x + widgetW > screenW) this.x = screenW - widgetW - 10;
+                        }
+                        localStorage.setItem('chat_pos_x', this.x);
+                        localStorage.setItem('chat_pos_y', this.y);
+                    }
+                }
+            }
+        </script>
+        
     </body>
 </html>
