@@ -16,13 +16,11 @@
     </style>
 
     <!-- 
-      CORRECCIÓN DE DISEÑO: 
-      Agregamos '-mt-4 -mx-4' para anular el padding p-4 del layout principal (app.blade.php).
-      Esto hace que el banner azul toque los bordes y el header superior.
+      Ajuste de márgenes para que el banner toque los bordes 
     -->
     <div class="pb-12 relative -mt-4 -mx-4" x-data="{ showContractModal: false }">
         
-        <!-- Mensaje de Éxito (Ajustado con padding extra para que no quede pegado al borde) -->
+        <!-- Mensaje de Éxito -->
         @if (session('status'))
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
                 <div class="p-4 bg-green-100 text-green-800 text-base border border-green-300 rounded-xl shadow-sm dark:bg-green-900/50 dark:text-green-300 dark:border-green-800">
@@ -49,12 +47,12 @@
                             <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $empleado->name }}</h1>
                             <p class="text-blue-600 dark:text-blue-400 font-medium mt-1 mb-6">{{ $empleado->position->name ?? 'Sin Cargo Asignado' }}</p>
                             
-                            <!-- BOTÓN ABRIR CHAT (INSTANTÁNEO AJAX) -->
+                            <!-- BOTÓN ABRIR CHAT -->
                             @if(auth()->id() !== $empleado->id)
                             <div class="w-full max-w-xs">
                                 <button type="button" 
                                         onclick="openChatAsync({{ $empleado->id }})" 
-                                        class="btn-anim flex items-center justify-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-full font-bold shadow-md hover:bg-blue-700 transition-colors w-full cursor-pointer">
+                                        class="btn-anim flex items-center justify-center gap-2 px-6 py-2.5 bg-green-600 text-white rounded-full font-bold shadow-md hover:bg-green-700 transition-colors w-full cursor-pointer">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
                                     Abrir Chat
                                 </button>
@@ -86,6 +84,7 @@
         </div>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+            
             <!-- SECCIÓN 2: Contratos -->
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-2xl border border-gray-200 dark:border-gray-700">
                 <div class="p-8">
@@ -100,14 +99,22 @@
                             </button>
                         @endcan
                     </div>
-                    <div class="overflow-x-auto">
+                    
+                    <div class="overflow-x-auto rounded-xl border border-gray-100 dark:border-gray-700">
                         <table class="w-full text-left text-gray-500 dark:text-gray-400">
-                            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700/50 dark:text-gray-300 font-bold tracking-wider">
-                                <tr><th class="px-6 py-4 rounded-l-xl">Tipo</th><th class="px-6 py-4">Salario</th><th class="px-6 py-4">Periodo</th><th class="px-6 py-4 text-right rounded-r-xl">Estado</th> @can('is-admin')<th class="px-6 py-4 text-right">Acciones</th>@endcan</tr>
+                            <!-- HEADER VERDE (SOLICITADO) -->
+                            <thead class="text-sm text-white uppercase bg-primary-600 dark:bg-primary-900/50 font-bold tracking-wider">
+                                <tr>
+                                    <th class="px-6 py-4">Tipo</th>
+                                    <th class="px-6 py-4">Salario</th>
+                                    <th class="px-6 py-4">Periodo</th>
+                                    <th class="px-6 py-4 text-right">Estado</th> 
+                                    @can('is-admin')<th class="px-6 py-4 text-right">Acciones</th>@endcan
+                                </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                                 @forelse ($empleado->contracts as $contract)
-                                    <tr class="bg-white dark:bg-gray-800 row-card transition-colors">
+                                    <tr class="bg-white dark:bg-gray-800 row-card transition-colors hover:bg-gray-50">
                                         <td class="px-6 py-5 text-base font-medium text-gray-900 dark:text-white">{{ $contract->type->name ?? 'N/A' }}</td>
                                         <td class="px-6 py-5 font-bold text-green-600 dark:text-green-400">${{ number_format($contract->salary, 2) }}</td>
                                         <td class="px-6 py-5"><div class="text-sm text-gray-900 dark:text-white">{{ \Carbon\Carbon::parse($contract->start_date)->format('d M, Y') }}</div><div class="text-xs text-gray-500">{{ $contract->end_date ? 'Hasta ' . \Carbon\Carbon::parse($contract->end_date)->format('d M, Y') : 'Indefinido' }}</div></td>
@@ -139,14 +146,14 @@
                             <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2"><div class="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-lg text-blue-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div> Horas</h3>
                             <a href="{{ route('timesheets.create', $empleado->id) }}" class="btn-anim bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-xl text-sm shadow-md">Registrar</a>
                         </div>
-                        <div class="flex-grow overflow-auto max-h-96">
+                        <div class="flex-grow overflow-auto max-h-96 rounded-xl border border-gray-100 dark:border-gray-700">
                             <table class="w-full text-left text-gray-500 dark:text-gray-400">
                                 <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                                     @forelse ($empleado->timesheets->sortByDesc('date') as $timesheet)
                                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                                            <td class="py-4 px-2"><div class="font-medium text-gray-900 dark:text-white">{{ \Carbon\Carbon::parse($timesheet->date)->format('d M') }}</div><div class="text-xs text-gray-400">{{ \Carbon\Carbon::parse($timesheet->date)->format('Y') }}</div></td>
-                                            <td class="py-4 px-2 text-right"><span class="text-lg font-bold text-gray-900 dark:text-white">{{ $timesheet->hours_worked }}h</span></td>
-                                            <td class="py-4 px-2 text-right">
+                                            <td class="py-4 px-4"><div class="font-medium text-gray-900 dark:text-white">{{ \Carbon\Carbon::parse($timesheet->date)->format('d M') }}</div><div class="text-xs text-gray-400">{{ \Carbon\Carbon::parse($timesheet->date)->format('Y') }}</div></td>
+                                            <td class="py-4 px-4 text-right"><span class="text-lg font-bold text-gray-900 dark:text-white">{{ $timesheet->hours_worked }}h</span></td>
+                                            <td class="py-4 px-4 text-right">
                                                 <div class="flex items-center justify-end gap-2">
                                                     <a href="{{ route('timesheets.edit', $timesheet->id) }}" class="text-gray-400 hover:text-blue-500"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg></a>
                                                     <form method="POST" action="{{ route('timesheets.destroy', $timesheet->id) }}" class="inline">@csrf @method('DELETE')<button type="submit" class="text-gray-400 hover:text-red-500" onclick="return confirm('¿Borrar?')"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button></form>
@@ -167,13 +174,13 @@
                             <div class="p-2 bg-purple-100 dark:bg-purple-900/50 rounded-lg text-purple-600 dark:text-purple-400"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
                             <h3 class="text-xl font-bold text-gray-900 dark:text-white">Pagos Recibidos</h3>
                         </div>
-                        <div class="flex-grow overflow-auto max-h-96">
+                        <div class="flex-grow overflow-auto max-h-96 rounded-xl border border-gray-100 dark:border-gray-700">
                             <table class="w-full text-left text-gray-500 dark:text-gray-400">
                                 <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                                     @forelse ($empleado->payslips->sortByDesc('pay_period_start') as $payslip)
                                         <tr x-data="{ showPayslipModal: false }" class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer" @click="showPayslipModal = true">
-                                            <td class="py-4 px-2"><div class="font-medium text-gray-900 dark:text-white">{{ \Carbon\Carbon::parse($payslip->pay_period_start)->translatedFormat('F Y') }}</div><div class="text-xs text-gray-400">ID: #{{ $payslip->id }}</div></td>
-                                            <td class="py-4 px-2 text-right"><div class="text-lg font-bold text-green-600 dark:text-green-400">${{ number_format($payslip->net_pay, 2) }}</div></td>
+                                            <td class="py-4 px-4"><div class="font-medium text-gray-900 dark:text-white">{{ \Carbon\Carbon::parse($payslip->pay_period_start)->translatedFormat('F Y') }}</div><div class="text-xs text-gray-400">ID: #{{ $payslip->id }}</div></td>
+                                            <td class="py-4 px-4 text-right"><div class="text-lg font-bold text-green-600 dark:text-green-400">${{ number_format($payslip->net_pay, 2) }}</div></td>
                                             <template x-teleport="body">
                                                 <div x-show="showPayslipModal" style="display: none;" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 backdrop-blur-sm p-4 md:inset-0 h-full" @click.stop="">
                                                     <div class="relative w-full max-w-md h-auto" @click.away="showPayslipModal = false">
@@ -204,14 +211,21 @@
                         </h3>
                         <a href="{{ route('ausencias.create', $empleado->id) }}" class="btn-anim bg-orange-500 hover:bg-orange-600 text-white font-bold py-2.5 px-5 rounded-xl shadow-md transition-colors text-sm">Solicitar</a>
                     </div>
-                    <div class="overflow-x-auto">
+                    
+                    <div class="overflow-x-auto rounded-xl border border-gray-100 dark:border-gray-700">
                         <table class="w-full text-left text-gray-500 dark:text-gray-400">
-                            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700/50 dark:text-gray-300 font-bold tracking-wider">
-                                <tr><th class="px-6 py-4 rounded-l-xl">Fechas</th><th class="px-6 py-4">Motivo</th><th class="px-6 py-4">Estado</th><th class="px-6 py-4 text-right rounded-r-xl">Detalles</th></tr>
+                            <!-- HEADER VERDE (SOLICITADO) -->
+                            <thead class="text-sm text-white uppercase bg-primary-600 dark:bg-primary-900/50 font-bold tracking-wider">
+                                <tr>
+                                    <th class="px-6 py-4">Fechas</th>
+                                    <th class="px-6 py-4">Motivo</th>
+                                    <th class="px-6 py-4">Estado</th>
+                                    <th class="px-6 py-4 text-right">Detalles</th>
+                                </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                                 @forelse ($empleado->leaveRequests->sortByDesc('created_at') as $request)
-                                    <tr class="bg-white dark:bg-gray-800 row-card transition-colors" x-data="{ showModal: false }">
+                                    <tr class="bg-white dark:bg-gray-800 row-card transition-colors hover:bg-gray-50" x-data="{ showModal: false }">
                                         <td class="px-6 py-5 font-medium text-gray-900 dark:text-white">{{ \Carbon\Carbon::parse($request->start_date)->format('d M') }} - {{ \Carbon\Carbon::parse($request->end_date)->format('d M') }}</td>
                                         <td class="px-6 py-5 truncate max-w-xs">{{ $request->reason ?? '-' }}</td>
                                         <td class="px-6 py-5">
@@ -305,12 +319,9 @@
                     }
 
                     // 3. Inyectamos el HTML del widget en el cuerpo de la página
-                    // CORRECCIÓN: Usamos un contenedor temporal para extraer TODOS los elementos (estilos y div)
                     const tempContainer = document.createElement('div');
                     tempContainer.innerHTML = parsedHtml;
                     
-                    // Movemos cada hijo del contenedor temporal al body
-                    // Usamos un bucle while porque appendChild mueve el elemento, sacándolo de tempContainer
                     while (tempContainer.firstChild) {
                         document.body.appendChild(tempContainer.firstChild);
                     }

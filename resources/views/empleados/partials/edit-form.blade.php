@@ -2,136 +2,129 @@
     @csrf 
     @method('PATCH')
 
-    <!-- Campo oculto para identificar el empleado -->
-    <input type="hidden" name="id" value="{{ $empleado->id }}">
+    <!-- SECCIÓN 1: Datos Personales -->
+    <div class="mb-8">
+        <h4 class="text-lg font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-2">
+            <span class="w-1 h-6 bg-primary-500 rounded-full"></span>
+            Datos Personales
+        </h4>
 
-    <!-- 1. Datos Personales -->
-    <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-6 border-b pb-3 dark:border-gray-700">Datos Personales</h4>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-        <!-- Nombre -->
-        <div>
-            <label class="block mb-2 text-base font-medium text-gray-900 dark:text-white">Nombre Completo</label>
-            <input type="text" name="name" value="{{ old('name', $empleado->name) }}" 
-                   class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:text-white" 
-                   required 
-                   oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '')">
-            
-            @if($errors->has('name') && old('id') == $empleado->id) 
-                <span class="text-red-600 text-sm">{{ $errors->first('name') }}</span> 
-            @endif
-        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Nombre -->
+            <div class="group">
+                <label class="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-primary-600 transition-colors">Nombre Completo</label>
+                <input type="text" name="name" 
+                       class="block w-full p-3.5 bg-white border border-gray-200 rounded-xl shadow-sm text-gray-900 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300 ease-in-out hover:border-primary-300 hover:shadow-md dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-primary-500" 
+                       value="{{ old('name', $empleado->name) }}" 
+                       oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '')"
+                       placeholder="Ej: Juan Pérez"
+                       required>
+                @error('name') <span class="text-red-500 text-xs mt-1 font-bold">{{ $message }}</span> @enderror
+            </div>
 
-        <!-- Email -->
-        <div>
-            <label class="block mb-2 text-base font-medium text-gray-900 dark:text-white">Email</label>
-            <input type="email" name="email" value="{{ old('email', $empleado->email) }}" 
-                   class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:text-white" 
-                   required>
-            
-            @if($errors->has('email') && old('id') == $empleado->id) 
-                <span class="text-red-600 text-sm">{{ $errors->first('email') }}</span> 
-            @endif
-        </div>
+            <!-- Email -->
+            <div class="group">
+                <label class="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-primary-600 transition-colors">Correo Electrónico</label>
+                <input type="email" name="email" 
+                       class="block w-full p-3.5 bg-white border border-gray-200 rounded-xl shadow-sm text-gray-900 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300 ease-in-out hover:border-primary-300 hover:shadow-md dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-primary-500"
+                       value="{{ old('email', $empleado->email) }}" 
+                       placeholder="ejemplo@empresa.com"
+                       required>
+                @error('email') <span class="text-red-500 text-xs mt-1 font-bold">{{ $message }}</span> @enderror
+            </div>
 
-        <!-- Teléfono -->
-        <div>
-            <label class="block mb-2 text-base font-medium text-gray-900 dark:text-white">Teléfono</label>
-            <input type="tel" name="telefono" value="{{ old('telefono', $empleado->telefono) }}" 
-                   class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:text-white" 
-                   maxlength="15" 
-                   oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-            @if($errors->has('telefono') && old('id') == $empleado->id) 
-                <span class="text-red-600 text-sm">{{ $errors->first('telefono') }}</span> 
-            @endif
-        </div>
+            <!-- Teléfono -->
+            <div class="group">
+                <label class="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-primary-600 transition-colors">Teléfono</label>
+                <input type="tel" name="telefono" 
+                       class="block w-full p-3.5 bg-white border border-gray-200 rounded-xl shadow-sm text-gray-900 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300 ease-in-out hover:border-primary-300 hover:shadow-md dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-primary-500"
+                       value="{{ old('telefono', $empleado->telefono) }}"
+                       maxlength="15"
+                       oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                       placeholder="Solo números">
+            </div>
 
-        <!-- Dirección -->
-        <div>
-            <label class="block mb-2 text-base font-medium text-gray-900 dark:text-white">Dirección</label>
-            <input type="text" name="direccion" value="{{ old('direccion', $empleado->direccion) }}" 
-                   class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+            <!-- Dirección -->
+            <div class="group">
+                <label class="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-primary-600 transition-colors">Dirección</label>
+                <input type="text" name="direccion" 
+                       class="block w-full p-3.5 bg-white border border-gray-200 rounded-xl shadow-sm text-gray-900 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300 ease-in-out hover:border-primary-300 hover:shadow-md dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-primary-500"
+                       value="{{ old('direccion', $empleado->direccion) }}"
+                       placeholder="Calle Principal #123">
+            </div>
         </div>
     </div>
 
-    <!-- 2. Datos Laborales -->
-    <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-6 border-b pb-3 dark:border-gray-700">Información Laboral</h4>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-        <!-- Fecha Ingreso -->
-        <div>
-            <label class="block mb-2 text-base font-medium text-gray-900 dark:text-white">Fecha Ingreso</label>
-            <input type="date" name="fecha_contratacion" value="{{ old('fecha_contratacion', $empleado->fecha_contratacion) }}" 
-                   class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-        </div>
+    <!-- SECCIÓN 2: Información Laboral -->
+    <div class="mb-8">
+        <h4 class="text-lg font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-2">
+            <span class="w-1 h-6 bg-primary-500 rounded-full"></span>
+            Información Laboral
+        </h4>
 
-        <!-- Departamento -->
-        <div>
-            <label class="block mb-2 text-base font-medium text-gray-900 dark:text-white">Departamento</label>
-            <select name="department_id" 
-                    onchange="loadPositions(this.value, 'position_select_{{ $empleado->id }}')" 
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                <option value="">-- Seleccionar --</option>
-                @foreach ($departments as $dept)
-                    <option value="{{ $dept->id }}" 
-                        {{-- Prioridad: 1. Valor 'old' (si falló validación), 2. Valor actual de BD --}}
-                        {{ old('department_id', $empleado->position->department_id ?? '') == $dept->id ? 'selected' : '' }}>
-                        {{ $dept->name }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Fecha de Contratación -->
+            <div class="group">
+                <label class="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-primary-600 transition-colors">Fecha de Ingreso</label>
+                <input type="date" name="fecha_contratacion" 
+                       class="block w-full p-3.5 bg-white border border-gray-200 rounded-xl shadow-sm text-gray-900 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300 ease-in-out hover:border-primary-300 hover:shadow-md dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-primary-500"
+                       value="{{ old('fecha_contratacion', $empleado->fecha_contratacion) }}">
+            </div>
 
-        <!-- Cargo -->
-        <div>
-            <label class="block mb-2 text-base font-medium text-gray-900 dark:text-white">Cargo / Puesto</label>
-            <select name="position_id" id="position_select_{{ $empleado->id }}" 
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                
-                {{-- 
-                   LÓGICA ROBUSTA PARA CARGAR OPCIONES:
-                   Si el empleado ya tiene departamento, cargamos los cargos de ese departamento.
-                   El 'selected' se encarga de marcar el correcto.
-                --}}
-                @php
-                    $currentDeptId = old('department_id', $empleado->position->department_id ?? null);
-                    // Buscamos en la colección $departments que ya tenemos disponible en la vista
-                    $dept = $departments->firstWhere('id', $currentDeptId);
-                    $positions = $dept ? $dept->positions : collect([]);
-                @endphp
-
-                @if($positions->isNotEmpty())
-                    <option value="">-- Selecciona un Cargo --</option>
-                    @foreach($positions as $pos)
-                        <option value="{{ $pos->id }}" {{ old('position_id', $empleado->position_id) == $pos->id ? 'selected' : '' }}>
-                            {{ $pos->name }}
+            <!-- DEPARTAMENTO -->
+            <div class="group">
+                <label class="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-primary-600 transition-colors">Departamento</label>
+                <select id="edit_department_id_{{ $empleado->id }}" 
+                        onchange="loadPositions(this.value, 'edit_position_id_{{ $empleado->id }}')" 
+                        class="block w-full p-3.5 bg-white border border-gray-200 rounded-xl shadow-sm text-gray-900 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300 ease-in-out hover:border-primary-300 hover:shadow-md dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-primary-500 cursor-pointer">
+                    <option value="">-- Seleccionar --</option>
+                    @foreach ($departments as $dept)
+                        <option value="{{ $dept->id }}" {{ ($empleado->position && $empleado->position->department_id == $dept->id) ? 'selected' : '' }}>
+                            {{ $dept->name }}
                         </option>
                     @endforeach
-                @else
-                    <option value="">-- Selecciona Dept primero --</option>
-                @endif
-            </select>
-            
-            @if($errors->has('position_id') && old('id') == $empleado->id) 
-                <span class="text-red-600 text-sm">{{ $errors->first('position_id') }}</span> 
-            @endif
-        </div>
+                </select>
+            </div>
 
-        <!-- Contraseña (Opcional) -->
-        <div>
-            <label class="block mb-2 text-base font-medium text-gray-900 dark:text-white">Nueva Contraseña (Opcional)</label>
-            <input type="password" name="password" placeholder="Dejar en blanco para no cambiar" 
-                   class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+            <!-- CARGO -->
+            <div class="group">
+                <label class="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-primary-600 transition-colors">Cargo / Puesto</label>
+                <select name="position_id" id="edit_position_id_{{ $empleado->id }}" 
+                        class="block w-full p-3.5 bg-white border border-gray-200 rounded-xl shadow-sm text-gray-900 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300 ease-in-out hover:border-primary-300 hover:shadow-md dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-primary-500 cursor-pointer">
+                    <option value="">-- Selecciona Dept primero --</option>
+                    @if($empleado->position && $empleado->position->department)
+                        @foreach($empleado->position->department->positions as $pos)
+                            <option value="{{ $pos->id }}" {{ $empleado->position_id == $pos->id ? 'selected' : '' }}>
+                                {{ $pos->name }}
+                            </option>
+                        @endforeach
+                    @endif
+                </select>
+                @error('position_id') <span class="text-red-500 text-xs mt-1 font-bold">{{ $message }}</span> @enderror
+            </div>
         </div>
     </div>
 
-    <!-- Botones -->
-    <div class="flex justify-end space-x-4">
-        <button @click="showEditModal = false" type="button" class="text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 focus:ring-4 focus:outline-none focus:ring-blue-300 font-semibold rounded-xl text-base px-8 py-3 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 transition-colors">
+    <!-- SECCIÓN 3: Seguridad (Opcional) -->
+    <div class="mb-8 bg-gray-50 dark:bg-gray-700/30 p-5 rounded-xl border border-gray-100 dark:border-gray-700">
+        <div class="group">
+            <label class="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                Nueva Contraseña <span class="text-gray-400 font-normal text-xs">(Opcional)</span>
+            </label>
+            <input type="password" name="password" 
+                   class="block w-full p-3.5 bg-white border border-gray-200 rounded-xl shadow-sm text-gray-900 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300 ease-in-out hover:border-primary-300 hover:shadow-md dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-primary-500"
+                   placeholder="Dejar en blanco para mantener la actual">
+        </div>
+    </div>
+
+    <!-- Botones de Acción -->
+    <div class="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
+        <button @click="showEditModal = false" type="button" class="px-6 py-3 text-sm font-bold text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-gray-800 focus:outline-none focus:ring-4 focus:ring-gray-100 transition-all duration-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-500">
             Cancelar
         </button>
-        <button type="submit" class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-semibold rounded-xl text-base px-8 py-3 dark:bg-blue-600 dark:hover:bg-blue-700 transition-colors">
-            Actualizar
+        <button type="submit" class="px-8 py-3 text-sm font-bold text-white bg-primary-600 rounded-xl hover:bg-primary-700 focus:outline-none focus:ring-4 focus:ring-primary-300 shadow-lg shadow-primary-500/30 transform hover:scale-105 transition-all duration-200 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+            Guardar Cambios
         </button>
     </div>
 </form>

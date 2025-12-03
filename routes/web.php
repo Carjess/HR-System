@@ -11,12 +11,7 @@ use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\MessageController; 
-
-use App\Models\User;
-use App\Models\Contract;
-use App\Models\Timesheet;
-use App\Models\Department;
-use Carbon\Carbon;
+use App\Http\Controllers\DashboardController; // Importante: Nuevo Controlador
 
 /*
 |--------------------------------------------------------------------------
@@ -43,40 +38,21 @@ Route::get('/api/departamentos/{departamento}/cargos', [DepartmentController::cl
 
 
 // --- DASHBOARD ---
-Route::get('/dashboard', function () {
-    if (auth()->user()->role === 'admin') {
-        
-        $totalEmpleados = User::count();
-        $totalContratosActivos = Contract::whereNull('end_date')->orWhere('end_date', '>', Carbon::now())->count();
-        $horasEsteMes = Timesheet::whereBetween('date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->sum('hours_worked');
-        
-        // Cargamos datos para las tablas y modales del dashboard
-        $empleadosRecientes = User::with('position.department')->latest('fecha_contratacion')->take(5)->get();
-        $departments = Department::orderBy('name')->get(); // Necesario para el modal de editar en dashboard
-
-        return view('dashboard', [
-            'totalEmpleados' => $totalEmpleados,
-            'totalContratosActivos' => $totalContratosActivos,
-            'horasEsteMes' => $horasEsteMes,
-            'empleadosRecientes' => $empleadosRecientes,
-            'departments' => $departments
-        ]);
-    }
-    // Si es empleado, redirigir a su perfil
-    return redirect()->route('empleados.show', auth()->user()->id);
-
-})->middleware(['auth', 'verified'])->name('dashboard');
+// Toda la lógica ahora vive en DashboardController@index
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 
 // --- GRUPOS DE RUTAS AUTENTICADAS ---
 Route::middleware('auth')->group(function () {
     
-    // Perfil de Usuario
+    // Perfil de Usuario (Editar contraseña, borrar cuenta, etc.)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // --- ZONA DE ADMIN ---
+    // --- ZONA DE ADMIN (Solo accesible con permiso 'is-admin') ---
     Route::middleware('can:is-admin')->group(function () {
         
         // Gestión de Empleados
@@ -86,6 +62,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/empleados/{empleado}/editar', [EmployeeController::class, 'edit'])->name('empleados.edit');
         Route::patch('/empleados/{empleado}', [EmployeeController::class, 'update'])->name('empleados.update');
         Route::delete('/empleados/{empleado}', [EmployeeController::class, 'destroy'])->name('empleados.destroy');
+        
+        // Bandeja de Entrada de Mensajes (Inbox)
+        Route::get('/mensajes', [MessageController::class, 'inbox'])->name('messages.inbox');
         
         // Configuración (CRUDs)
         Route::resource('tipos-contrato', ContractTypeController::class);
@@ -109,7 +88,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/payroll', [PayrollController::class, 'index'])->name('payroll.index');
         Route::post('/payroll/generate', [PayrollController::class, 'generate'])->name('payroll.generate');
         
-        // Gestión de Ausencias
+        // Gestión de Ausencias (Aprobar/Rechazar)
         Route::get('/ausencias', [LeaveRequestController::class, 'index'])->name('ausencias.index');
         Route::patch('/ausencias/{leaveRequest}/approve', [LeaveRequestController::class, 'approve'])->name('ausencias.approve');
         Route::patch('/ausencias/{leaveRequest}/reject', [LeaveRequestController::class, 'reject'])->name('ausencias.reject');
@@ -118,24 +97,26 @@ Route::middleware('auth')->group(function () {
         Route::post('/empleados/{empleado}/message', [EmployeeController::class, 'sendMessage'])->name('empleados.message');
     });
 
-    // --- ZONA DE EMPLEADO (Y ADMIN) ---
-    // Ver Perfil Propio
+    // --- ZONA DE EMPLEADO (ACCESIBLE POR TODOS LOS LOGUEADOS) ---
+    
+    // Ver Perfil Propio (o de otros si eres admin)
     Route::get('/empleados/{empleado}', [EmployeeController::class, 'show'])->name('empleados.show');
     
-    // Acciones de Empleado
+    // Acciones de Empleado (Timesheets y Ausencias)
     Route::get('/empleados/{empleado}/timesheets/crear', [TimesheetController::class, 'create'])->name('timesheets.create');
     Route::post('/empleados/{empleado}/timesheets', [TimesheetController::class, 'store'])->name('timesheets.store');
+    
     Route::get('/empleados/{empleado}/ausencias/crear', [LeaveRequestController::class, 'create'])->name('ausencias.create');
     Route::post('/empleados/{empleado}/ausencias', [LeaveRequestController::class, 'store'])->name('ausencias.store');
 
-    // --- NUEVAS RUTAS: CHAT INTERNO ---
-    // --- RUTAS DEL CHAT GLOBAL ---
+    // --- RUTAS DEL CHAT INTERNO ---
+    
+    // API Chat Global (Widget)
     Route::post('/chat/open/{user}', [MessageController::class, 'openChat'])->name('chat.open');
     Route::post('/chat/close', [MessageController::class, 'closeChat'])->name('chat.close');
-    
-    // Ver el chat con un usuario específico
+
+    // Pantalla de Chat Dedicada
     Route::get('/chat/{user}', [MessageController::class, 'chat'])->name('messages.chat');
-    // Enviar un mensaje en ese chat
     Route::post('/chat/{user}', [MessageController::class, 'store'])->name('messages.store');
 
 });

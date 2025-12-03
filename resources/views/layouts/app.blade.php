@@ -14,16 +14,37 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-        <!-- Estilo para x-cloak (evita parpadeo al cargar Alpine) -->
-        <style>
-            [x-cloak] { display: none !important; }
-        </style>
+        <!-- Estilo para x-cloak -->
+        <style> [x-cloak] { display: none !important; } </style>
+
+        <!-- SCRIPT DE INICIALIZACIÓN DEL MODO OSCURO (Evita FOUC - Flash of Unstyled Content) -->
+        <script>
+            if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        </script>
     </head>
     
-    <body class="font-sans antialiased bg-gray-50 dark:bg-gray-900" 
+    <!-- 
+        Agregamos la lógica de 'darkMode' y 'toggleTheme' al x-data global 
+    -->
+    <body class="font-sans antialiased bg-gray-50 dark:bg-gray-900 transition-colors duration-300" 
           x-data="{ 
               sidebarOpen: localStorage.getItem('sidebarOpen') ? localStorage.getItem('sidebarOpen') === 'true' : true,
-              isSidebarReady: false
+              isSidebarReady: false,
+              darkMode: localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches),
+              toggleTheme() {
+                  this.darkMode = !this.darkMode;
+                  if (this.darkMode) {
+                      document.documentElement.classList.add('dark');
+                      localStorage.setItem('theme', 'dark');
+                  } else {
+                      document.documentElement.classList.remove('dark');
+                      localStorage.setItem('theme', 'light');
+                  }
+              }
           }"
           x-init="$watch('sidebarOpen', val => localStorage.setItem('sidebarOpen', val)); setTimeout(() => isSidebarReady = true, 300)">
         
@@ -36,7 +57,7 @@
             <div class="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
                 
                 <!-- HEADER SUPERIOR -->
-                <header class="flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-800 shadow-sm z-10 sticky top-0">
+                <header class="flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-800 shadow-sm z-10 sticky top-0 transition-colors duration-300">
                     
                     <!-- Botón Móvil -->
                     <button @click="sidebarOpen = !sidebarOpen" class="text-gray-500 focus:outline-none lg:hidden">
@@ -50,13 +71,12 @@
                         {{ $header ?? '' }}
                     </div>
 
-                    <!-- Perfil -->
+                    <!-- Perfil (Dropdown) -->
                     <div class="flex items-center">
                         <x-dropdown align="right" width="48">
                             <x-slot name="trigger">
                                 <button class="flex items-center text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition duration-150 ease-in-out">
-                                    <!-- Avatar con Inicial -->
-                                    <div class="h-9 w-9 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
+                                    <div class="h-9 w-9 rounded-full bg-primary-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
                                         {{ substr(Auth::user()->name, 0, 1) }}
                                     </div>
                                 </button>
@@ -83,7 +103,7 @@
                     </div>
                 </header>
 
-                <!-- CONTENIDO DE LA PÁGINA -->
+                <!-- CONTENIDO -->
                 <main class="flex-1 p-4">
                     {{ $slot }}
                 </main>
@@ -92,12 +112,11 @@
         </div>
 
         <!-- === CHAT GLOBAL === -->
-        <!-- Solo se muestra si el AppServiceProvider inyectó las variables -->
-         @if(isset($globalChatUser))
+         @if(isset($globalChatUser) && !request()->routeIs('messages.inbox'))
             @include('messages.chat', ['empleado' => $globalChatUser, 'messages' => $globalChatMessages])
         @endif
 
-        <!-- SCRIPT DEL CHAT WIDGET (MOVIDO AQUÍ PARA QUE SEA GLOBAL) -->
+        <!-- SCRIPT DEL CHAT WIDGET -->
         <script>
             function chatWidget() {
                 return {
@@ -133,7 +152,6 @@
 
                     closeGlobalChat() {
                         this.isOpen = false;
-                        // Eliminar elemento del DOM para evitar conflictos si se vuelve a abrir
                         setTimeout(() => {
                             const el = this.$el;
                             if (el && el.parentNode) el.parentNode.removeChild(el);

@@ -6,55 +6,44 @@ use App\Models\User;
 use App\Models\Message;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Builder; // Importante para consultas avanzadas
 
 class MessageController extends Controller
 {
     /**
-     * Muestra la sala de chat (Vista completa tradicional).
-     * Usada cuando accedes directamente a /chat/{user}
+     * Muestra la sala de chat individual (Vista tradicional).
      */
     public function chat(User $user)
     {
         $myId = Auth::id();
         $otherId = $user->id;
 
-        // 1. Evitar chatear con uno mismo
-        if ($myId === $otherId) {
-            return back();
-        }
+        if ($myId === $otherId) return back();
 
-        // 2. Marcar como leídos los mensajes recibidos
+        // Marcar leídos
         Message::where('sender_id', $otherId)
             ->where('receiver_id', $myId)
             ->where('is_read', false)
             ->update(['is_read' => true]);
 
-        // 3. Obtener la conversación completa
+        // Cargar conversación
         $messages = Message::where(function($q) use ($myId, $otherId) {
-                $q->where('sender_id', $myId)
-                  ->where('receiver_id', $otherId);
+                $q->where('sender_id', $myId)->where('receiver_id', $otherId);
             })
             ->orWhere(function($q) use ($myId, $otherId) {
-                $q->where('sender_id', $otherId)
-                  ->where('receiver_id', $myId);
+                $q->where('sender_id', $otherId)->where('receiver_id', $myId);
             })
-            ->orderBy('created_at', 'asc')
-            ->get();
+            ->orderBy('created_at', 'asc')->get();
 
-        // Retornamos la vista (Aquí usamos compact, que pasa $user como $user)
-        // Nota: Si usas el componente chat.blade.php directamente aquí, asegúrate de las variables.
-        // Pero esta función 'chat' suele ser para una página dedicada, no el widget.
         return view('messages.chat', compact('user', 'messages'));
     }
 
     /**
-     * Envía un nuevo mensaje.
+     * Guardar mensaje nuevo.
      */
     public function store(Request $request, User $user)
     {
-        $request->validate([
-            'message' => 'required|string|max:2000',
-        ]);
+        $request->validate(['message' => 'required|string|max:2000']);
 
         Message::create([
             'sender_id' => Auth::id(),
@@ -65,54 +54,100 @@ class MessageController extends Controller
             'allow_reply' => true
         ]);
 
-        // Volvemos atrás (recarga para mostrar el mensaje nuevo)
         return back();
     }
 
-    // --- FUNCIONES PARA EL CHAT GLOBAL (WIDGET FLOTANTE) ---
+    // --- FUNCIONES DEL WIDGET GLOBAL ---
 
-    /**
-     * Activa el chat global con un usuario.
-     * SOPORTA AJAX: Si se llama desde JS, devuelve HTML sin recargar.
-     */
     public function openChat(Request $request, User $user)
     {
-        // 1. Siempre guardamos la sesión para que persista al navegar
         session(['active_chat_user_id' => $user->id]);
         
-        // 2. DETECCIÓN INTELIGENTE: ¿Es una petición AJAX (JSON)?
         if ($request->ajax() || $request->wantsJson()) {
-            
             $myId = Auth::id();
             $targetId = $user->id;
-
-            // Buscamos los mensajes (misma lógica que usamos en el AppServiceProvider)
+            
             $messages = Message::where(function($q) use ($targetId, $myId) {
                 $q->where('sender_id', $myId)->where('receiver_id', $targetId);
             })->orWhere(function($q) use ($targetId, $myId) {
                 $q->where('sender_id', $targetId)->where('receiver_id', $myId);
             })->orderBy('created_at', 'asc')->get();
 
-            // Renderizamos SOLO el componente visual ('messages.chat') y lo convertimos a texto HTML
-            // IMPORTANTE: Pasamos 'empleado' => $user porque chat.blade.php espera la variable $empleado
             $html = view('messages.chat', ['empleado' => $user, 'messages' => $messages])->render();
-            
-            // Devolvemos el HTML en un JSON para que Javascript lo pegue en el body
             return response()->json(['html' => $html]);
         }
-        
-        // 3. Fallback: Si por alguna razón no es Ajax, recargamos la página normalmente
         return back();
     }
 
-    /**
-     * Cierra el chat global.
-     */
     public function closeChat()
     {
-        // Borramos la variable de sesión para que no aparezca al recargar
         session()->forget('active_chat_user_id');
-        
         return response()->json(['status' => 'closed']);
+    }
+
+    // --- BANDEJA DE ENTRADA (INBOX) ---
+    public function inbox(Request $request)
+    {
+        $filter = $request->query('filter', 'all'); // 'all' o 'mine'
+        $adminId = Auth::id();
+
+        // 1. Base: Usuarios que no sean admin y tengan algún mensaje (Enviado O Recibido)
+        // Usamos where(function...) para agrupar las condiciones OR correctamente
+        $employeesQuery = User::where('role', '!=', 'admin')
+            ->where(function($query) {
+                $query->whereHas('sentMessages')
+                      ->orWhereHas('receivedMessages');
+            });
+
+        // 2. Filtro "Mis Chats"
+        if ($filter === 'mine') {
+            // Muestra usuarios con los que YO he interactuado (Yo les escribí O ellos me escribieron)
+            $employeesQuery->where(function($q) use ($adminId) {
+                $q->whereHas('receivedMessages', function ($subQ) use ($adminId) {
+                    $subQ->where('sender_id', $adminId); // Mensajes que YO envié
+                })->orWhereHas('sentMessages', function ($subQ) use ($adminId) {
+                    $subQ->where('receiver_id', $adminId); // Mensajes que YO recibí
+                });
+            });
+        }
+
+        // 3. Carga optimizada (Eager Loading) para la previsualización en la lista
+        $employees = $employeesQuery->with(['sentMessages' => function($q) {
+            $q->latest()->limit(1);
+        }, 'receivedMessages' => function($q) {
+            $q->latest()->limit(1);
+        }])->get();
+
+        // 4. Ordenar por fecha del último mensaje (el más reciente arriba)
+        $employees = $employees->sortByDesc(function($user) {
+            $lastSent = $user->sentMessages->first()?->created_at;
+            $lastReceived = $user->receivedMessages->first()?->created_at;
+            // Si no hay mensajes (caso raro por el filtro anterior), usa una fecha antigua
+            return max($lastSent, $lastReceived) ?? 0;
+        });
+
+        // 5. Cargar chat seleccionado (si se hizo clic en uno de la lista)
+        $selectedConversation = null;
+        $messages = [];
+        
+        if ($request->has('user_id')) {
+            $otherUser = User::find($request->user_id);
+            if ($otherUser) {
+                $selectedConversation = $otherUser;
+                // Marcar como leídos los mensajes que este usuario ME envió a MÍ
+                Message::where('sender_id', $otherUser->id)
+                       ->where('receiver_id', $adminId)
+                       ->update(['is_read' => true]);
+                
+                // Traer historial completo de la conversación
+                $messages = Message::where(function($q) use ($adminId, $otherUser) {
+                    $q->where('sender_id', $adminId)->where('receiver_id', $otherUser->id);
+                })->orWhere(function($q) use ($adminId, $otherUser) {
+                    $q->where('sender_id', $otherUser->id)->where('receiver_id', $adminId);
+                })->orderBy('created_at', 'asc')->get();
+            }
+        }
+
+        return view('messages.inbox', compact('employees', 'filter', 'selectedConversation', 'messages'));
     }
 }

@@ -22,7 +22,7 @@
                             <div>
                                 <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nombre Completo</label>
                                 <input type="text" name="name" id="name" 
-                                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" 
+                                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" 
                                        value="{{ old('name', $empleado->name) }}" 
                                        oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '')"
                                        required>
@@ -32,7 +32,7 @@
                             <!-- Email -->
                             <div>
                                 <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Correo Electrónico</label>
-                                <input type="email" name="email" id="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" value="{{ old('email', $empleado->email) }}" required>
+                                <input type="email" name="email" id="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" value="{{ old('email', $empleado->email) }}" required>
                                 @error('email') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
                             </div>
 
@@ -40,7 +40,7 @@
                             <div>
                                 <label for="telefono" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Teléfono</label>
                                 <input type="tel" name="telefono" id="telefono" 
-                                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" 
+                                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" 
                                        value="{{ old('telefono', $empleado->telefono) }}"
                                        maxlength="15"
                                        oninput="this.value = this.value.replace(/[^0-9]/g, '')">
@@ -50,7 +50,7 @@
                             <!-- Dirección -->
                             <div>
                                 <label for="direccion" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Dirección</label>
-                                <input type="text" name="direccion" id="direccion" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" value="{{ old('direccion', $empleado->direccion) }}">
+                                <input type="text" name="direccion" id="direccion" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" value="{{ old('direccion', $empleado->direccion) }}">
                             </div>
                         </div>
 
@@ -61,13 +61,13 @@
                             <!-- Fecha de Contratación -->
                             <div>
                                 <label for="fecha_contratacion" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Fecha de Ingreso</label>
-                                <input type="date" name="fecha_contratacion" id="fecha_contratacion" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ old('fecha_contratacion', $empleado->fecha_contratacion) }}">
+                                <input type="date" name="fecha_contratacion" id="fecha_contratacion" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ old('fecha_contratacion', $empleado->fecha_contratacion) }}">
                             </div>
 
                             <!-- SELECT DEPARTAMENTO -->
                             <div>
                                 <label for="department_id" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Departamento</label>
-                                <select id="department_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
+                                <select id="department_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
                                     <option value="">-- Selecciona un Departamento --</option>
                                     @foreach ($departments as $dept)
                                         <option value="{{ $dept->id }}" {{ $currentDepartmentId == $dept->id ? 'selected' : '' }}>
@@ -77,10 +77,10 @@
                                 </select>
                             </div>
 
-                            <!-- SELECT CARGO (Se llena con JS) -->
+                            <!-- SELECT CARGO -->
                             <div>
                                 <label for="position_id" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Cargo / Puesto</label>
-                                <select name="position_id" id="position_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" {{ $currentDepartmentId ? '' : 'disabled' }}>
+                                <select name="position_id" id="position_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" {{ $currentDepartmentId ? '' : 'disabled' }}>
                                     <option value="">-- Selecciona un Cargo --</option>
                                     @foreach($positions as $position)
                                         <option value="{{ $position->id }}" {{ old('position_id', $empleado->position_id) == $position->id ? 'selected' : '' }}>
@@ -92,16 +92,16 @@
                             </div>
                         </div>
 
-                        <!-- Seguridad (Opcional) -->
+                        <!-- Seguridad -->
                         <div class="mb-6">
                             <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nueva Contraseña (Opcional)</label>
-                            <input type="password" name="password" id="password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Dejar en blanco para mantener la actual">
+                            <input type="password" name="password" id="password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Dejar en blanco para mantener la actual">
                             @error('password') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
                         </div>
 
                         <div class="flex justify-end">
                             <a href="{{ route('empleados.index') }}" class="text-gray-600 dark:text-gray-400 hover:underline mr-4 flex items-center">Cancelar</a>
-                            <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+                            <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800 transition-colors">
                                 Actualizar Empleado
                             </button>
                         </div>
@@ -112,38 +112,26 @@
         </div>
     </div>
 
-    <!-- SCRIPT PARA CARGAR LOS CARGOS DINÁMICAMENTE -->
     <script>
+        // Mismo script de carga dinámica de cargos
         document.getElementById('department_id').addEventListener('change', function() {
             var departmentId = this.value;
             var positionSelect = document.getElementById('position_id');
-
-            // Reiniciar el select de cargos
             positionSelect.innerHTML = '<option value="">Cargando...</option>';
             positionSelect.disabled = true;
 
             if (departmentId) {
-                // Petición a la API que creamos
                 fetch('/api/departamentos/' + departmentId + '/cargos')
                     .then(response => response.json())
                     .then(data => {
                         positionSelect.innerHTML = '<option value="">-- Selecciona un Cargo --</option>';
-                        
                         if(data.length > 0){
                             data.forEach(position => {
                                 var option = document.createElement('option');
-                                option.value = position.id;
-                                option.text = position.name;
-                                positionSelect.appendChild(option);
+                                option.value = position.id; option.text = position.name; positionSelect.appendChild(option);
                             });
-                            positionSelect.disabled = false; // Habilitar si hay cargos
-                        } else {
-                            positionSelect.innerHTML = '<option value="">No hay cargos en este departamento</option>';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        positionSelect.innerHTML = '<option value="">Error al cargar</option>';
+                            positionSelect.disabled = false;
+                        } else { positionSelect.innerHTML = '<option value="">No hay cargos</option>'; }
                     });
             } else {
                 positionSelect.innerHTML = '<option value="">-- Primero selecciona un Departamento --</option>';
@@ -151,5 +139,4 @@
             }
         });
     </script>
-
 </x-app-layout>
