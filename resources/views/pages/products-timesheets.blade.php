@@ -58,13 +58,7 @@
                 
                 <!-- Texto (Izquierda) -->
                 <div class="lg:w-1/2 text-center lg:text-left reveal">
-                    <div class="inline-flex items-center rounded-full px-6 py-2 text-sm font-bold text-purple-300 ring-1 ring-inset ring-purple-400/30 bg-purple-400/10 mb-8">
-                        <span class="relative flex h-2 w-2 mr-2">
-                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
-                          <span class="relative inline-flex rounded-full h-2 w-2 bg-purple-500"></span>
-                        </span>
-                        Control en Tiempo Real
-                    </div>
+                    
                     <h1 class="text-6xl font-black tracking-tight text-white sm:text-8xl mb-10 leading-[1.1]">
                         Cada minuto<br>
                         <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-fuchsia-300">Cuenta.</span>

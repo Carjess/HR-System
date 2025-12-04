@@ -17,7 +17,9 @@
 
     {{-- x-data para el modal de crear empleado --}}
     <div class="" x-data="{ showCreateModal: {{ $errors->any() && !$errors->has('id') ? 'true' : 'false' }} }">
-        <div class="w-full">
+        
+        <!-- CORRECCIÓN: Agregamos 'relative z-0' para aislar las tarjetas y que no tapen el menú del perfil -->
+        <div class="w-full relative z-0">
             
             <!-- 1. TARJETAS DE ESTADÍSTICAS (ESTILO PREMIUM UNIFICADO) -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
@@ -66,7 +68,6 @@
                 </div>
 
                 <!-- CARD 3: Horas este Mes (COLOR CORREGIDO) -->
-                <!-- Se eliminó el tinte violeta y se unificó el estilo al verde/primary -->
                 <div class="bg-gradient-to-br from-primary-800 to-primary-900 rounded-2xl shadow-xl border border-primary-700/50 relative overflow-hidden group">
                     <!-- Decoración cambiada a Esmeralda/Blanco para coincidir -->
                     <div class="absolute top-0 left-0 -mt-4 -ml-4 w-24 h-24 bg-emerald-500 opacity-10 rounded-full blur-2xl group-hover:opacity-20 transition-opacity duration-500"></div>
@@ -183,7 +184,7 @@
                             
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left text-gray-500 dark:text-gray-400">
-                                    <thead class="text-sm text-white uppercase bg-primary-600 dark:bg-primary-90 font-bold tracking-wider">
+                                    <thead class="text-sm text-white uppercase bg-primary-600 dark:bg-primary-900/50 font-bold tracking-wider">
                                         <tr>
                                             <th scope="col" class="px-6 py-4 rounded-l-lg">Empleado</th>
                                             <th scope="col" class="px-6 py-4">Puesto</th>

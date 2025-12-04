@@ -42,9 +42,7 @@
                 
                 <!-- Texto (Izquierda) -->
                 <div class="lg:w-1/2 text-center lg:text-left reveal">
-                    <div class="inline-flex items-center rounded-full px-6 py-2 text-sm font-bold text-indigo-300 ring-1 ring-inset ring-indigo-400/30 bg-indigo-400/10 mb-8">
-                        Precisión Financiera 💸
-                    </div>
+                   
                     <h1 class="text-6xl font-black tracking-tight text-white sm:text-8xl mb-10 leading-[1.1]">
                         Nómina,<br>
                         <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-300">Automatizada.</span>
@@ -54,7 +52,7 @@
                     </p>
                     <div class="mt-12 flex items-center justify-center lg:justify-start gap-x-8">
                         <a href="{{ route('login') }}" class="rounded-2xl bg-indigo-600 px-10 py-5 text-xl font-bold text-white shadow-xl shadow-indigo-500/30 hover:bg-indigo-500 hover:scale-105 transition-all duration-300">
-                            Probar Motor
+                            Probar Ahora
                         </a>
                     </div>
                 </div>
@@ -66,18 +64,7 @@
                             <img src="{{ asset('img/payroll-1.png') }}" alt="Dashboard de Nómina" class="w-full h-full object-cover" 
                                  onerror="this.parentElement.innerHTML='<div class=\'w-full h-full flex flex-col items-center justify-center text-indigo-400 bg-slate-900\'><svg class=\'w-32 h-32 mb-6 opacity-50\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1\' d=\'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z\'/></svg><span class=\'text-2xl font-bold\'>Sube tu captura: payroll-1.png</span></div>'">
                             
-                            <!-- Tarjeta Flotante Decorativa (Grande) -->
-                            <div class="absolute -bottom-8 -right-8 bg-white rounded-2xl p-6 shadow-2xl border border-gray-100 hidden lg:block animate-bounce duration-[4000ms]">
-                                <div class="flex items-center gap-4">
-                                    <div class="h-14 w-14 rounded-full bg-green-100 flex items-center justify-center text-green-600">
-                                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm text-gray-500 font-bold uppercase tracking-wider">Estado</p>
-                                        <p class="text-xl font-black text-gray-900">Pago Exitoso</p>
-                                    </div>
-                                </div>
-                            </div>
+                            
                         </div>
                     </div>
                 </div>
@@ -91,7 +78,7 @@
             
             <div class="mx-auto max-w-3xl text-center mb-24 reveal">
                 <h2 class="text-lg font-bold leading-7 text-indigo-600 uppercase tracking-widest">Cálculo Inteligente</h2>
-                <p class="mt-6 text-5xl font-black tracking-tight text-gray-900 sm:text-7xl">Finanzas sin fricción</p>
+                <p class="mt-6 text-5xl font-black tracking-tight text-gray-900 sm:text-7xl">Finanzas sin preocupación</p>
             </div>
 
             <!-- GRID DE TARJETAS (Aumentado de tamaño) -->

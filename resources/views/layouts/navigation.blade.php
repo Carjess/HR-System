@@ -1,7 +1,7 @@
 <!-- 
     SIDEBAR DE NAVEGACIÓN
     Diseño: Fondo Blanco Limpio con Acentos Verde Petróleo (#315762)
-    Funcionalidad: Colapsable.
+    Funcionalidad: Colapsable. Footer con MENÚ DE CONFIGURACIÓN.
 -->
 <aside :class="[
             sidebarOpen ? 'w-64' : 'w-20',
@@ -10,30 +10,30 @@
        class="flex flex-col flex-shrink-0 h-full bg-white dark:bg-gray-900 z-20 shadow-xl border-r border-gray-100 dark:border-gray-800 transition-colors duration-300"> 
     
     <!-- 1. CABECERA (LOGO Y BOTÓN) -->
-    <!-- Ajuste: Cuando está cerrado (!sidebarOpen), usamos justify-center para centrar el botón de hamburguesa -->
     <div class="flex items-center h-20 px-4 overflow-hidden bg-white dark:bg-gray-900 transition-colors duration-300"
          :class="[
             sidebarOpen ? 'justify-between' : 'justify-center',
             isSidebarReady ? 'transition-all duration-300' : ''
          ]">
         
-        <!-- Logo / Nombre (Visible SOLO cuando está ABIERTO) -->
-        <div class="flex items-center gap-3 min-w-0" x-show="sidebarOpen" x-transition.opacity.duration.200ms>
-            <div class="flex-shrink-0 p-1.5 bg-primary-50 dark:bg-primary-900/30 rounded-lg">
-                <a href="{{ route('dashboard') }}">
-                    <!-- Logo Pequeño (Cuadrado) -->
-                    <svg class="h-8 w-8 text-primary-600 dark:text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                    </svg>
-                </a>
-            </div>
-            <span class="text-xl font-bold text-gray-800 dark:text-white whitespace-nowrap tracking-wide">
-                HR-<span class="text-primary-600 dark:text-primary-400">System</span>
-            </span>
+        <!-- Logo / Nombre -->
+        <div class="flex items-center justify-center w-full" x-show="sidebarOpen" x-transition.opacity.duration.200ms>
+            <a href="{{ route('dashboard') }}" class="block">
+                
+                <img src="{{ asset('img/rh_green.png') }}" 
+                     alt="Logo HR-System" 
+                     class="h-16 w-aut block dark:hidden">
+
+                <img src="{{ asset('img/rh_white.jpg') }}" 
+                     alt="Logo HR-System" 
+                     class="h-16 w-auto hidden dark:block">
+            </a>
         </div>
 
-        <!-- Botón Alternar (Hamburguesa) -->
-        <!-- Este botón siempre es visible. Si el menú está cerrado, queda centrado por el justify-center del padre -->
+        <!-- Logo Solo (Cerrado) -->
+        
+
+        <!-- Botón Alternar -->
         <button @click="sidebarOpen = !sidebarOpen" 
                 class="hidden lg:block text-gray-400 hover:text-primary-600 focus:outline-none flex-shrink-0 transition-colors p-1 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-primary-400"
                 title="Alternar Menú">
@@ -60,23 +60,26 @@
             <span x-show="sidebarOpen" x-cloak class="ml-3 font-medium whitespace-nowrap">Mensajería</span>
         </x-nav-link>
 
+        <!-- CALENDARIO -->
+        <x-nav-link :href="route('calendar.index')" :active="request()->routeIs('calendar.*')" x-bind:class="sidebarOpen ? '' : 'justify-center'">
+            <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            <span x-show="sidebarOpen" x-cloak class="ml-3 font-medium whitespace-nowrap">Calendario</span>
+        </x-nav-link>
+
         @can('is-admin')
             <div x-show="sidebarOpen" class="my-4 border-t border-gray-100 dark:border-gray-800"></div>
             <p x-show="sidebarOpen" x-transition class="px-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Gestión</p>
 
-            <!-- EMPLEADOS -->
             <x-nav-link :href="route('empleados.index')" :active="request()->routeIs('empleados.*')" x-bind:class="sidebarOpen ? '' : 'justify-center'">
                 <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                 <span x-show="sidebarOpen" x-cloak class="ml-3 font-medium whitespace-nowrap">Empleados</span>
             </x-nav-link>
 
-            <!-- AUSENCIAS -->
             <x-nav-link :href="route('ausencias.index')" :active="request()->routeIs('ausencias.*')" x-bind:class="sidebarOpen ? '' : 'justify-center'">
                 <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                 <span x-show="sidebarOpen" x-cloak class="ml-3 font-medium whitespace-nowrap">Ausencias</span>
             </x-nav-link>
 
-            <!-- NÓMINA -->
             <x-nav-link :href="route('payroll.index')" :active="request()->routeIs('payroll.*')" x-bind:class="sidebarOpen ? '' : 'justify-center'">
                 <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 <span x-show="sidebarOpen" x-cloak class="ml-3 font-medium whitespace-nowrap">Nómina</span>
@@ -85,13 +88,11 @@
             <div x-show="sidebarOpen" class="my-4 border-t border-gray-100 dark:border-gray-800"></div>
             <p x-show="sidebarOpen" x-transition class="px-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Admin</p>
 
-            <!-- DEPARTAMENTOS -->
             <x-nav-link :href="route('departamentos.index')" :active="request()->routeIs('departamentos.*')" x-bind:class="sidebarOpen ? '' : 'justify-center'">
                 <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-3a1 1 0 011-1h2a1 1 0 011 1v3m-5-10v-3a1 1 0 011-1h2a1 1 0 011 1v3"></path></svg>
                 <span x-show="sidebarOpen" x-cloak class="ml-3 font-medium whitespace-nowrap">Deptos</span>
             </x-nav-link>
 
-            <!-- CONTRATOS -->
             <x-nav-link :href="route('tipos-contrato.index')" :active="request()->routeIs('tipos-contrato.*')" x-bind:class="sidebarOpen ? '' : 'justify-center'">
                 <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                 <span x-show="sidebarOpen" x-cloak class="ml-3 font-medium whitespace-nowrap">Contratos</span>
@@ -99,7 +100,6 @@
         @endcan
         
         @if(auth()->user()->role === 'employee')
-            <!-- MI PERFIL -->
             <x-nav-link :href="route('empleados.show', auth()->user()->id)" :active="request()->routeIs('empleados.show')" x-bind:class="sidebarOpen ? '' : 'justify-center'">
                 <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                 <span x-show="sidebarOpen" x-cloak class="ml-3 font-medium whitespace-nowrap">Mi Perfil</span>
@@ -109,7 +109,7 @@
     </div>
     
     <!-- 3. FOOTER DEL SIDEBAR (CONFIGURACIÓN) -->
-    <!-- Menú desplegable de configuración -->
+    <!-- CORRECCIÓN: El menú flotante ahora tiene clases dinámicas para posicionarse bien -->
     <div class="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 transition-colors duration-300 relative" 
          x-data="{ configOpen: false }">
         
@@ -117,15 +117,19 @@
         <div x-show="configOpen" 
              @click.away="configOpen = false"
              x-transition:enter="transition ease-out duration-100"
-             x-transition:enter-start="opacity-0 transform scale-95 translate-y-2"
-             x-transition:enter-end="opacity-100 transform scale-100 translate-y-0"
+             x-transition:enter-start="opacity-0 transform scale-95"
+             x-transition:enter-end="opacity-100 transform scale-100"
              x-transition:leave="transition ease-in duration-75"
-             x-transition:leave-start="opacity-100 transform scale-100 translate-y-0"
-             x-transition:leave-end="opacity-0 transform scale-95 translate-y-2"
-             class="absolute bottom-full left-4 right-4 mb-2 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden z-50">
+             x-transition:leave-start="opacity-100 transform scale-100"
+             x-transition:leave-end="opacity-0 transform scale-95"
+             
+             /* CLASE DINÁMICA: Si sidebarOpen, arriba. Si cerrado, a la derecha */
+             :class="sidebarOpen ? 'bottom-full left-4 right-4 mb-2 w-auto' : 'left-full bottom-2 ml-3 w-56'"
+             
+             class="absolute bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-700 overflow-hidden z-50">
             
             <div class="p-2 space-y-1">
-                <!-- Opción: Tema (Dark/Light) -->
+                <!-- Opción: Tema -->
                 <button @click="toggleTheme()" class="w-full flex items-center justify-between px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors">
                     <div class="flex items-center gap-2">
                         <svg x-show="!darkMode" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
@@ -135,7 +139,7 @@
                     <span class="text-xs text-gray-400" x-text="darkMode ? 'Oscuro' : 'Claro'"></span>
                 </button>
 
-                <!-- Opción: Idioma (Placeholder) -->
+                <!-- Opción: Idioma -->
                 <button class="w-full flex items-center justify-between px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors opacity-50 cursor-not-allowed" title="Próximamente">
                     <div class="flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path></svg>
@@ -146,9 +150,15 @@
             </div>
         </div>
 
-        <!-- BOTÓN PRINCIPAL (ENGRANAJE REAL) -->
+        <!-- BOTÓN PRINCIPAL -->
         <button @click="configOpen = !configOpen" 
-                class="flex items-center w-full p-2.5 rounded-xl transition-colors duration-200 group hover:bg-white dark:hover:bg-gray-800 shadow-sm border border-transparent hover:border-gray-200 dark:hover:border-gray-700"
+                class="flex items-center w-full p-2.5 rounded-xl transition-colors duration-200 group hover:bg-white dark:hover:bg-gray-800 hover:shadow-sm hover:border-gray-200 dark:hover:border-gray-700"
+                :class="sidebarOpen ? '' : 'justify-center'"
+                title="Configuración">
+            
+            <!-- BOTÓN PRINCIPAL (ENGRANAJE REAL) -->
+        <button @click="configOpen = !configOpen" 
+                class="flex items-center w-full p-2.5 rounded-xl transition-colors duration-200 group hover:bg-white dark:hover:bg-gray-800 hover:shadow-sm hover:border-gray-200 dark:hover:border-gray-700"
                 :class="sidebarOpen ? '' : 'justify-center'"
                 title="Configuración">
             
@@ -160,12 +170,10 @@
                 </svg>
             </div>
 
-            <!-- Texto -->
             <div class="flex-1 min-w-0 text-left ml-3" x-show="sidebarOpen" x-cloak>
                 <p class="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-primary-600 dark:group-hover:text-white transition-colors">Configuración</p>
             </div>
             
-            <!-- Flechita -->
             <div class="text-gray-400" x-show="sidebarOpen" x-cloak>
                 <svg class="w-4 h-4 transform transition-transform duration-200" :class="configOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
             </div>

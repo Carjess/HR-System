@@ -42,9 +42,7 @@
                 
                 <!-- Texto (Izquierda) -->
                 <div class="lg:w-1/2 text-center lg:text-left reveal">
-                    <div class="inline-flex items-center rounded-full px-6 py-2 text-sm font-bold text-cyan-300 ring-1 ring-inset ring-cyan-400/30 bg-cyan-400/10 mb-8">
-                        Recursos Humanos 2.0 🚀
-                    </div>
+                    
                     <h1 class="text-6xl font-black tracking-tight text-white sm:text-8xl mb-10 leading-[1.1]">
                         Tu equipo,<br>
                         <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">Sincronizado.</span>
@@ -62,20 +60,11 @@
                 <!-- Imagen (Derecha) -->
                 <div class="lg:w-1/2 relative reveal delay-200 w-full">
                     <div class="relative rounded-3xl bg-gradient-to-br from-white/10 to-white/5 p-3 ring-1 ring-white/20 backdrop-blur-sm transform hover:rotate-1 transition-transform duration-700">
-                        <div class="rounded-2xl overflow-hidden shadow-2xl aspect-[16/10] bg-slate-900 relative">
+                        <div class="rounded-2xl overflow-hidden shadow-5xl aspect-[16/10] bg-slate-900 relative">
                             <img src="{{ asset('img/personnel-1.png') }}" alt="Dashboard de Personal" class="w-full h-full object-cover" 
                                  onerror="this.parentElement.innerHTML='<div class=\'w-full h-full flex flex-col items-center justify-center text-blue-400 bg-slate-900\'><svg class=\'w-32 h-32 mb-6 opacity-50\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1\' d=\'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z\'/></svg><span class=\'text-2xl font-bold\'>Sube tu captura: personnel-1.png</span></div>'">
                             
-                            <!-- Tarjeta Flotante Decorativa -->
-                            <div class="absolute -bottom-8 -left-8 bg-white rounded-2xl p-6 shadow-2xl border border-gray-100 hidden lg:block animate-bounce duration-[3000ms]">
-                                <div class="flex items-center gap-4">
-                                    <div class="h-14 w-14 rounded-full bg-green-100 flex items-center justify-center text-green-600">✓</div>
-                                    <div>
-                                        <p class="text-sm text-gray-500 font-bold uppercase tracking-wider">Estado</p>
-                                        <p class="text-xl font-black text-gray-900">Completo</p>
-                                    </div>
-                                </div>
-                            </div>
+                            
                         </div>
                     </div>
                 </div>
@@ -105,7 +94,7 @@
                             <div class="h-16 w-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white mb-8 shadow-lg shadow-blue-500/30">
                                 <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
                             </div>
-                            <h3 class="text-3xl font-bold text-gray-900 mb-4">Expediente 360°</h3>
+                            <h3 class="text-3xl font-bold text-gray-900 mb-4">Lista de empleados</h3>
                             <p class="text-xl text-gray-600 max-w-xl leading-relaxed">Toda la vida del empleado en una sola pantalla. Datos personales, contacto, historial de direcciones y documentos.</p>
                         </div>
                         <!-- Mockup interno -->
@@ -153,7 +142,7 @@
                 <!-- Tarjeta de Imagen/Carrusel Pequeño -->
                 <div class="md:col-span-2 relative overflow-hidden rounded-[2.5rem] bg-blue-50 p-2 ring-1 ring-blue-100 reveal delay-200">
                     <div class="w-full h-full rounded-[2rem] overflow-hidden relative group cursor-pointer">
-                        <img src="{{ asset('img/personnel-2.png') }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Detalle Empleado" onerror="this.parentElement.innerHTML='<div class=\'w-full h-full bg-blue-100 flex items-center justify-center text-blue-500 font-bold\'>Sube: personnel-2.png</div>'">
+                        <img src="{{ asset('img/personnel-2.png') }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Detalle Empleado" onerror="this.parentElement.innerHTML='<div class=\'w-full h-full bg-blue-100 flex items-center justify-center text-blue-500 font-bold\'>Sube: personnel-2.png</div>'">
                         
                         <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-12">
                             <div class="text-white">

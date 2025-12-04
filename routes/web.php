@@ -11,8 +11,8 @@ use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\MessageController; 
-use App\Http\Controllers\DashboardController; // Importante: Nuevo Controlador
-
+use App\Http\Controllers\DashboardController; 
+use App\Http\Controllers\EventController;
 /*
 |--------------------------------------------------------------------------
 | RUTAS PÚBLICAS (VISIBLES SIN INICIAR SESIÓN)
@@ -47,6 +47,11 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 // --- GRUPOS DE RUTAS AUTENTICADAS ---
 Route::middleware('auth')->group(function () {
     
+    // Ruta para el calendario
+    Route::get('/calendar', [App\Http\Controllers\EventController::class, 'index'])->name('calendar.index');
+    Route::post('/calendar', [App\Http\Controllers\EventController::class, 'store'])->name('calendar.store');
+    Route::delete('/calendar/{event}', [App\Http\Controllers\EventController::class, 'destroy']);
+
     // Perfil de Usuario (Editar contraseña, borrar cuenta, etc.)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

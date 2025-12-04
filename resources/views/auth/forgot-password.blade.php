@@ -1,70 +1,45 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-gray-50">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-
-    <title>{{ config('app.name', 'Laravel') }} - Recuperar Contraseña</title>
-
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-
-    <!-- Scripts y Estilos (Vite) -->
+    <title>Recuperar Acceso - HR-System</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="font-sans text-gray-900 antialiased">
-    <section class="bg-gray-50 dark:bg-gray-900">
-        <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+<body class="h-full font-sans antialiased text-gray-900 flex items-center justify-center p-4">
+    
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+        <div class="p-8 sm:p-10 text-center">
             
-            <!-- Logo -->
-            <a href="/" class="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
-                <svg class="w-8 h-8 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.004 9.004 0 0112 21c-2.67 0-5.116-.713-7.157-1.932m14.314 0c1.218 1.218 1.932 2.85 1.932 4.582M2.843 19.068c-1.218-1.218-1.932-2.85-1.932-4.582"></path>
-                </svg>
-                HR-System    
-            </a>
+            <!-- Icono de Candado/Seguridad -->
+            <div class="mx-auto h-20 w-20 bg-orange-50 rounded-full flex items-center justify-center mb-6 text-orange-500 shadow-inner">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            </div>
 
-            <!-- Tarjeta/Formulario -->
-            <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
-                <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
-                    <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-                        ¿Olvidaste tu contraseña?
-                    </h1>
-                    
-                    <p class="text-sm font-light text-gray-500 dark:text-gray-400">
-                        No te preocupes. Escribe tu email y te enviaremos un enlace para restablecer tu contraseña.
-                    </p>
+            <h1 class="text-2xl font-black text-gray-900 tracking-tight mb-4">¿Olvidaste tu contraseña?</h1>
+            
+            <div class="bg-blue-50 rounded-xl p-4 mb-8 text-left border border-blue-100">
+                <p class="text-sm text-blue-800 leading-relaxed font-medium">
+                    <span class="block mb-2 font-bold text-blue-900">🔒 Política de Seguridad</span>
+                    El restablecimiento automático de contraseñas está desactivado para proteger los datos sensibles de la empresa.
+                </p>
+            </div>
+            
+            <p class="text-base text-gray-600 leading-relaxed mb-8">
+                Para recuperar tu acceso, por favor contacta directamente al departamento de <strong>Recursos Humanos</strong> o a tu supervisor inmediato para que te generen una nueva credencial temporal.
+            </p>
 
-                    <!-- Mensajes de Estado -->
-                    <x-auth-session-status class="mb-4" :status="session('status')" />
-                    
-                    <form class="space-y-4 md:space-y-6" method="POST" action="{{ route('password.email') }}">
-                        @csrf
-
-                        <!-- Email -->
-                        <div>
-                            <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tu email</label>
-                            <x-text-input id="email" type="email" name="email" :value="old('email')" required autofocus 
-                                          class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
-                                          placeholder="nombre@empresa.com" />
-                            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-                        </div>
-
-                        <!-- Botón de Enviar -->
-                        <button type="submit" class="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                            Enviar enlace de reseteo
-                        </button>
-                        
-                        <!-- Volver a Login -->
-                        <p class="text-sm font-light text-gray-500 dark:text-gray-400">
-                            ¿Ya te acordaste? <a href="{{ route('login') }}" class="font-medium text-blue-600 hover:underline dark:text-blue-500">Inicia sesión</a>
-                        </p>
-                    </form>
-                </div>
+            <div class="space-y-4">
+                <a href="{{ route('login') }}" class="flex w-full justify-center rounded-xl bg-primary-600 px-3 py-3.5 text-sm font-bold text-white shadow-lg hover:bg-primary-700 transition-all hover:-translate-y-0.5 duration-200">
+                    Volver a Iniciar Sesión
+                </a>
+            </div>
+            
+            <div class="mt-8 pt-6 border-t border-gray-100">
+                <p class="text-xs text-gray-400">Si eres administrador, puedes restablecer contraseñas de otros usuarios desde el panel de gestión de empleados.</p>
             </div>
         </div>
-    </section>
+    </div>
+
 </body>
 </html>

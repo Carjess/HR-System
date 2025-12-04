@@ -30,18 +30,24 @@
                 
                 <!-- Logo -->
                 <div class="flex lg:flex-1">
-                    <a href="{{ route('home') }}" class="-m-1.5 p-1.5 flex items-center gap-2 group">
-                        <!-- Icono cambia de fondo según estado -->
-                        <div class="p-1.5 rounded-lg transition-colors duration-500"
-                             :class="scrolled ? 'bg-primary-600 text-white' : 'bg-white/10 text-white backdrop-blur-sm border border-white/20'">
-                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                            </svg>
+                    <a href="{{ route('home') }}" class="-m-1.5 p-1.5 flex items-center group">
+        
+                        <div class="flex-shrink-0 -mr-5">
+                            <img src="{{ asset('img/rh_green.png') }}" 
+                                alt="HR System" 
+                                class="h-12 w-auto"
+                                x-show="scrolled"
+                                style="display: none;"> 
+
+                            <img src="{{ asset('img/rh_white.jpg') }}" 
+                                alt="HR System" 
+                                class="h-12 w-auto"
+                                x-show="!scrolled">
                         </div>
-                        <!-- Texto cambia de color -->
-                        <span class="text-xl font-bold tracking-tight transition-colors duration-500"
-                              :class="scrolled ? 'text-gray-900' : 'text-white'">
-                            HR-<span :class="scrolled ? 'text-primary-600' : 'text-primary-200'">System</span>
+
+                        <span class="text-3xl font-bold tracking-tight transition-colors duration-500 z-10"
+                            :class="scrolled ? 'text-gray-900' : 'text-white'">
+                            <span :class="scrolled ? 'text-teal-900' : 'text-white-200'">- System</span>
                         </span>
                     </a>
                 </div>
@@ -91,7 +97,7 @@
                                     <div class="flex h-10 w-10 flex-none items-center justify-center rounded-lg bg-primary-50 group-hover:bg-primary-100 transition-colors">
                                         <svg class="h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                                     </div>
-                                    <div><div class="font-semibold text-gray-900">Personal</div><p class="text-xs text-gray-500">Expedientes y perfiles 360°</p></div>
+                                    <div><div class="font-semibold text-gray-900">Personal</div><p class="text-xs text-gray-500">Lista de empleados y perfiles</p></div>
                                 </a>
                                 <a href="{{ route('products.contracts') }}" class="group relative flex items-center gap-x-4 rounded-xl p-3 hover:bg-gray-50 transition-colors">
                                     <div class="flex h-10 w-10 flex-none items-center justify-center rounded-lg bg-emerald-50 group-hover:bg-emerald-100 transition-colors">
