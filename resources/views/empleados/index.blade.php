@@ -69,7 +69,7 @@
                     <div class="overflow-hidden rounded-2xl shadow-md border border-gray-200 dark:border-gray-700"> 
                         <table class="w-full text-left text-gray-500 dark:text-gray-400">
                             <!-- HEADER VERDE PETRÓLEO -->
-                            <thead class="text-sm text-white uppercase font-bold tracking-wider bg-primary-600 dark:bg-primary-900/50">
+                            <thead class="text-sm text-white uppercase font-bold tracking-wider bg-primary-600 dark:bg-primary-90">
                                 <tr>
                                     <th scope="col" class="px-6 py-4">Empleado</th>
                                     <th scope="col" class="px-6 py-4">Puesto</th>

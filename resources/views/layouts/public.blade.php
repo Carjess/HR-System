@@ -1,200 +1,185 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full scroll-smooth">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>HR-System - Gestiona tu Equipo</title>
+        <title>HR-System - Gestión Inteligente de Personal</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
+        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
 
-        <!-- Scripts y Estilos (Vite) -->
-        {{-- Alpine.js se importa a través de app.js --}}
+        <!-- Scripts y Estilos -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased bg-gray-100 h-full">
+    <body class="font-sans antialiased bg-gray-50 h-full selection:bg-orange-100 selection:text-orange-600 flex flex-col">
         
-        <!-- 1. BARRA DE NAVEGACIÓN "ISLA" -->
-        <header class="fixed inset-x-0 top-0 z-50 flex justify-center pt-8">
-            {{-- `x-data="{ open: false }"` inicializa Alpine.js para el menú móvil --}}
-            <nav class="flex items-center justify-between px-6 py-3 lg:px-8 w-11/12 max-w-7xl 
-                        bg-white/95 rounded-full shadow-lg ring-1 ring-gray-900/5 backdrop-blur-sm" 
-                 aria-label="Global" x-data="{ open: false }">
+        <!-- 1. BARRA DE NAVEGACIÓN DINÁMICA -->
+        <header class="fixed inset-x-0 top-0 z-50 flex justify-center pt-6 transition-all duration-500" 
+                x-data="{ scrolled: false, mobileOpen: false }" 
+                @scroll.window="scrolled = (window.pageYOffset > 20)">
+            
+            <!-- 
+                LÓGICA DE ESTILOS:
+                - Si scrolled es true: Fondo blanco, sombra, texto oscuro (estilo isla).
+                - Si scrolled es false: Fondo transparente, sin sombra, texto blanco (estilo inmersivo).
+            -->
+            <nav class="flex items-center justify-between px-6 lg:px-8 w-11/12 max-w-7xl rounded-full transition-all duration-500 ease-in-out" 
+                 :class="scrolled ? 'bg-white/90 shadow-2xl ring-1 ring-gray-900/5 backdrop-blur-md py-3' : 'bg-transparent shadow-none py-5'"
+                 aria-label="Global">
                 
-                <!-- Logo/Nombre -->
+                <!-- Logo -->
                 <div class="flex lg:flex-1">
-                    <a href="{{ route('home') }}" class="-m-1.5 p-1.5">
-                        <span class="text-xl font-bold text-gray-900">HR-System</span>
+                    <a href="{{ route('home') }}" class="-m-1.5 p-1.5 flex items-center gap-2 group">
+                        <!-- Icono cambia de fondo según estado -->
+                        <div class="p-1.5 rounded-lg transition-colors duration-500"
+                             :class="scrolled ? 'bg-primary-600 text-white' : 'bg-white/10 text-white backdrop-blur-sm border border-white/20'">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                            </svg>
+                        </div>
+                        <!-- Texto cambia de color -->
+                        <span class="text-xl font-bold tracking-tight transition-colors duration-500"
+                              :class="scrolled ? 'text-gray-900' : 'text-white'">
+                            HR-<span :class="scrolled ? 'text-primary-600' : 'text-primary-200'">System</span>
+                        </span>
                     </a>
                 </div>
 
-                <!-- Botón de Menú Móvil -->
+                <!-- Botón Menú Móvil -->
                 <div class="flex lg:hidden">
-                    <button type="button" @click="open = true" class="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700">
-                        <span class="sr-only">Abrir menú principal</span>
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <button type="button" @click="mobileOpen = true" 
+                            class="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 transition-colors duration-500"
+                            :class="scrolled ? 'text-gray-700 hover:text-primary-600' : 'text-white hover:text-primary-200'">
+                        <span class="sr-only">Abrir menú</span>
+                        <svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
                         </svg>
                     </button>
                 </div>
 
-                <!-- Enlaces de Navegación (Escritorio) -->
-                <div class="hidden lg:flex lg:gap-x-12">
-                    <a href="{{ route('home') }}" class="text-sm font-semibold leading-6 text-gray-900 hover:text-blue-600">Inicio</a>
-                    <a href="{{ route('about') }}" class="text-sm font-semibold leading-6 text-gray-900 hover:text-blue-600">Sobre Nosotros</a>
+                <!-- Enlaces Escritorio -->
+                <div class="hidden lg:flex lg:gap-x-10">
+                    <a href="{{ route('home') }}" 
+                       class="text-sm font-semibold leading-6 transition-colors duration-500"
+                       :class="scrolled ? 'text-gray-900 hover:text-primary-600' : 'text-white hover:text-primary-200'">
+                       Inicio
+                    </a>
                     
-                    <!-- Menú Desplegable "Productos" -->
-                    <div class="relative" x-data="{ productsOpen: false }" @click.outside="productsOpen = false">
-                        <button type="button" @click="productsOpen = ! productsOpen" class="flex items-center gap-x-1 text-sm font-semibold leading-6 text-gray-900 hover:text-blue-600">
-                            Productos
-                            <svg class="h-5 w-5 flex-none text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <!-- Dropdown Soluciones -->
+                    <div class="relative group" x-data="{ productsOpen: false }" @click.outside="productsOpen = false">
+                        <button type="button" @click="productsOpen = ! productsOpen" 
+                                class="flex items-center gap-x-1 text-sm font-semibold leading-6 outline-none transition-colors duration-500"
+                                :class="scrolled ? 'text-gray-900 hover:text-primary-600' : 'text-white hover:text-primary-200'">
+                            Soluciones
+                            <svg class="h-4 w-4 flex-none transition-colors duration-500" 
+                                 :class="scrolled ? 'text-gray-400 group-hover:text-primary-600' : 'text-white/70 group-hover:text-white'"
+                                 viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.25 4.25a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
                             </svg>
                         </button>
                         
-                        <!-- Panel Desplegable (Escritorio) -->
+                        <!-- Panel Dropdown (Siempre blanco por legibilidad) -->
                         <div x-show="productsOpen" 
                              x-transition:enter="transition ease-out duration-200" 
                              x-transition:enter-start="opacity-0 translate-y-1" 
                              x-transition:enter-end="opacity-100 translate-y-0" 
-                             x-transition:leave="transition ease-in duration-150" 
-                             x-transition:leave-start="opacity-100 translate-y-0" 
-                             x-transition:leave-end="opacity-0 translate-y-1" 
-                             class="absolute -left-8 top-full z-10 mt-5 w-screen max-w-md overflow-hidden rounded-3xl bg-white shadow-lg ring-1 ring-gray-900/5"
+                             class="absolute -left-8 top-full z-20 mt-3 w-screen max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-gray-900/5"
                              style="display: none;">
-                            <div class="p-4">
-                                <!-- Enlace Producto 1 -->
-                                <div class="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-gray-50">
-                                    <div class="flex h-11 w-11 flex-none items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white">
-                                        <svg class="h-6 w-6 text-gray-600 group-hover:text-blue-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372m-1.066-2.625a8.37 8.37 0 0 1 3.32-3.32M9 11.625a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25a8.25 8.25 0 0 1-8.25 8.25A8.25 8.25 0 0 1 3 14.25a8.25 8.25 0 0 1 16.5 0Z" />
-                                        </svg>
+                            <div class="p-2">
+                                <a href="{{ route('products.personnel') }}" class="group relative flex items-center gap-x-4 rounded-xl p-3 hover:bg-gray-50 transition-colors">
+                                    <div class="flex h-10 w-10 flex-none items-center justify-center rounded-lg bg-primary-50 group-hover:bg-primary-100 transition-colors">
+                                        <svg class="h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                                     </div>
-                                    <div class="flex-auto">
-                                        <a href="{{ route('products.personnel') }}" @click="productsOpen = false" class="block font-semibold text-gray-900">
-                                            Gestión de Personal
-                                            <span class="absolute inset-0"></span>
-                                        </a>
-                                        <p class="mt-1 text-gray-600">Administra tus empleados.</p>
+                                    <div><div class="font-semibold text-gray-900">Personal</div><p class="text-xs text-gray-500">Expedientes y perfiles 360°</p></div>
+                                </a>
+                                <a href="{{ route('products.contracts') }}" class="group relative flex items-center gap-x-4 rounded-xl p-3 hover:bg-gray-50 transition-colors">
+                                    <div class="flex h-10 w-10 flex-none items-center justify-center rounded-lg bg-emerald-50 group-hover:bg-emerald-100 transition-colors">
+                                        <svg class="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                                     </div>
-                                </div>
-                                <!-- Enlace Producto 2 -->
-                                <div class="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-gray-50">
-                                    <div class="flex h-11 w-11 flex-none items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white">
-                                        <svg class="h-6 w-6 text-gray-600 group-hover:text-blue-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
-                                        </svg>
+                                    <div><div class="font-semibold text-gray-900">Contratos</div><p class="text-xs text-gray-500">Gestión de documentos legales</p></div>
+                                </a>
+                                <a href="{{ route('products.payroll') }}" class="group relative flex items-center gap-x-4 rounded-xl p-3 hover:bg-gray-50 transition-colors">
+                                    <div class="flex h-10 w-10 flex-none items-center justify-center rounded-lg bg-blue-50 group-hover:bg-blue-100 transition-colors">
+                                        <svg class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                     </div>
-                                    <div class="flex-auto">
-                                        <a href="{{ route('products.contracts') }}" @click="productsOpen = false" class="block font-semibold text-gray-900">
-                                            Gestión de Contratos
-                                            <span class="absolute inset-0"></span>
-                                        </a>
-                                        <p class="mt-1 text-gray-600">Administra tipos y detalles de contratos.</p>
+                                    <div><div class="font-semibold text-gray-900">Nómina</div><p class="text-xs text-gray-500">Cálculo de pagos automático</p></div>
+                                </a>
+                                <a href="{{ route('products.timesheets') }}" class="group relative flex items-center gap-x-4 rounded-xl p-3 hover:bg-gray-50 transition-colors">
+                                    <div class="flex h-10 w-10 flex-none items-center justify-center rounded-lg bg-purple-50 group-hover:bg-purple-100 transition-colors">
+                                        <svg class="h-5 w-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0 1 18 0z" /></svg>
                                     </div>
-                                </div>
-                                <!-- Enlace Producto 3 -->
-                                <div class="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-gray-50">
-                                    <div class="flex h-11 w-11 flex-none items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white">
-                                        <svg class="h-6 w-6 text-gray-600 group-hover:text-blue-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                        </svg>
-                                    </div>
-                                    <div class="flex-auto">
-                                        <a href="{{ route('products.timesheets') }}" @click="productsOpen = false" class="block font-semibold text-gray-900">
-                                            Facturación de Horas
-                                            <span class="absolute inset-0"></span>
-                                        </a>
-                                        <p class="mt-1 text-gray-600">Registra y controla las horas trabajadas.</p>
-                                    </div>
-                                </div>
-                                <!-- Enlace Producto 4 -->
-                                <div class="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-gray-50">
-                                    <div class="flex h-11 w-11 flex-none items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white">
-                                        <svg class="h-6 w-6 text-gray-600 group-hover:text-blue-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.75A.75.75 0 0 1 3 4.5h.75m0 0v.75A.75.75 0 0 1 3 6h-.75m0 0v.75A.75.75 0 0 1 3 4.5h.75m0 0V3m0 3v.75A.75.75 0 0 1 3 6h-.75M3.75 9v.75A.75.75 0 0 1 3 10.5h-.75m0 0v-.75A.75.75 0 0 1 3 9h.75m0 0v.75A.75.75 0 0 1 3 10.5h-.75m0 0v.75A.75.75 0 0 1 3 9h.75m0 0V6m0 3v.75A.75.75 0 0 1 3 10.5h-.75M3.75 12v.75A.75.75 0 0 1 3 13.5h-.75m0 0v-.75A.75.75 0 0 1 3 12h.75m0 0v.75A.75.75 0 0 1 3 13.5h-.75m0 0v.75A.75.75 0 0 1 3 12h.75m0 0V9m0 3v.75a.75.75 0 0 1-.75.75h-.75m0 0v-.75a.75.75 0 0 1 .75-.75h.75m0 0v.75a.75.75 0 0 1-.75.75h-.75m0 0v.75a.75.75 0 0 1 .75-.75h.75m0 0h-.75a.75.75 0 0 1-.75-.75V9m1.5 4.5v.75a.75.75 0 0 1-.75.75h-.75m0 0v-.75a.75.75 0 0 1 .75-.75h.75m0 0v.75a.75.75 0 0 1-.75.75h-.75m0 0V9m6 6v.75a.75.75 0 0 1-.75.75h-.75m0 0v-.75a.75.75 0 0 1 .75-.75h.75m0 0v.75a.75.75 0 0 1-.75.75h-.75m0 0V9m6 6v.75a.75.75 0 0 1-.75.75h-.75m0 0v-.75a.75.75 0 0 1 .75-.75h.75m0 0v.75a.75.75 0 0 1-.75.75h-.75m0 0V9" />
-                                        </svg>
-                                    </div>
-                                    <div class="flex-auto">
-                                        <a href="{{ route('products.payroll') }}" @click="productsOpen = false" class="block font-semibold text-gray-900">
-                                            Pagos de Nómina
-                                            <span class="absolute inset-0"></span>
-                                        </a>
-                                        <p class="mt-1 text-gray-600">Genera recibos de pago.</p>
-                                    </div>
-                                </div>
+                                    <div><div class="font-semibold text-gray-900">Horas</div><p class="text-xs text-gray-500">Control de asistencia y tiempo</p></div>
+                                </a>
                             </div>
                         </div>
                     </div>
+
+                    <a href="{{ route('about') }}" 
+                       class="text-sm font-semibold leading-6 transition-colors duration-500"
+                       :class="scrolled ? 'text-gray-900 hover:text-primary-600' : 'text-white hover:text-primary-200'">
+                       Sobre Nosotros
+                    </a>
                 </div>
 
-                <!-- Botón Iniciar Sesión (Escritorio) -->
-                <div class="hidden lg:flex lg:flex-1 lg:justify-end">
+                <!-- Botones Acción -->
+                <div class="hidden lg:flex lg:flex-1 lg:justify-end gap-4">
                     @if (Route::has('login'))
                         @auth
-                            <a href="{{ url('/dashboard') }}" class="text-sm font-semibold leading-6 text-gray-900 px-4 py-2 rounded-full border border-gray-300 hover:bg-gray-50 transition duration-150">Dashboard</a>
+                            <a href="{{ url('/dashboard') }}" 
+                               class="text-sm font-bold leading-6 transition-colors flex items-center gap-1"
+                               :class="scrolled ? 'text-primary-700 hover:text-primary-900' : 'text-white hover:text-primary-200'">
+                                Ir al Dashboard <span aria-hidden="true">&rarr;</span>
+                            </a>
                         @else
-                            <a href="{{ route('login') }}" class="rounded-full bg-blue-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                                Iniciar Sesión <span aria-hidden="true">&rarr;</span>
+                            <a href="{{ route('login') }}" 
+                               class="rounded-full px-5 py-2.5 text-sm font-bold text-white shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5"
+                               :class="scrolled ? 'bg-primary-600 shadow-primary-600/30 hover:bg-primary-700' : 'bg-white/20 backdrop-blur-md border border-white/30 hover:bg-white/30'">
+                                Iniciar Sesión
                             </a>
                         @endauth
                     @endif
                 </div>
             </nav>
 
-            <!-- Menú Móvil (Panel lateral) -->
-            <!-- ESTE ES EL BLOQUE QUE ESTABA INCOMPLETO EN MI RESPUESTA ANTERIOR -->
-            <div x-show="open" x-transition:enter="duration-150 ease-out" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="duration-150 ease-in" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" 
-                class="lg:hidden" x-ref="dialog" @click.outside="open = false" style="display: none;">
-                <div class="fixed inset-0 z-50"></div> {{-- Fondo oscuro --}}
-                <div class="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
-                    <!-- Encabezado Menú Móvil -->
+            <!-- Menú Móvil (Slide Over) -->
+            <div x-show="mobileOpen" class="lg:hidden" style="display: none;">
+                <div class="fixed inset-0 z-50 bg-gray-900/60 backdrop-blur-sm" @click="mobileOpen = false" x-transition.opacity></div>
+                <div class="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm shadow-2xl" 
+                     x-transition:enter="transform transition ease-in-out duration-300"
+                     x-transition:enter-start="translate-x-full"
+                     x-transition:enter-end="translate-x-0"
+                     x-transition:leave="transform transition ease-in-out duration-300"
+                     x-transition:leave-start="translate-x-0"
+                     x-transition:leave-end="translate-x-full">
+                    
                     <div class="flex items-center justify-between">
-                        <a href="{{ route('home') }}" class="-m-1.5 p-1.5">
+                        <a href="#" class="-m-1.5 p-1.5 flex items-center gap-2">
+                            <div class="bg-primary-600 text-white p-1 rounded-lg">
+                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                            </div>
                             <span class="text-xl font-bold text-gray-900">HR-System</span>
                         </a>
-                        <button type="button" @click="open = false" class="-m-2.5 rounded-md p-2.5 text-gray-700">
+                        <button type="button" @click="mobileOpen = false" class="-m-2.5 rounded-md p-2.5 text-gray-700 hover:bg-gray-100">
                             <span class="sr-only">Cerrar menú</span>
-                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
                     </div>
-                    <!-- Contenido Menú Móvil -->
                     <div class="mt-6 flow-root">
-                        <div class="-my-6 divide-y divide-gray-500/10">
+                        <div class="-my-6 divide-y divide-gray-100">
                             <div class="space-y-2 py-6">
-                                <a href="{{ route('home') }}" @click="open = false" class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">Inicio</a>
-                                <a href="{{ route('about') }}" @click="open = false" class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">Sobre Nosotros</a>
-                                
-                                <!-- Desplegable "Productos" Móvil -->
-                                <div class="relative" x-data="{ productsOpenMobile: false }">
-                                    <button @click="productsOpenMobile = !productsOpenMobile" type="button" class="flex w-full items-center justify-between -mx-3 rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
-                                        Productos
-                                        <svg :class="{ 'rotate-180': productsOpenMobile }" class="h-5 w-5 flex-none transition duration-150 ease-in-out" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.25 4.25a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
-                                        </svg>
-                                    </button>
-                                    <!-- Panel de Productos Móvil -->
-                                    <div x-show="productsOpenMobile" class="mt-2 space-y-2 px-3" style="display: none;">
-                                        <a href="{{ route('products.personnel') }}" @click="open = false" class="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 text-gray-900 hover:bg-gray-50">Gestión de Personal</a>
-                                        <a href="{{ route('products.contracts') }}" @click="open = false" class="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 text-gray-900 hover:bg-gray-50">Gestión de Contratos</a>
-                                        <a href="{{ route('products.timesheets') }}" @click="open = false" class="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 text-gray-900 hover:bg-gray-50">Facturación de Horas</a>
-                                        <a href="{{ route('products.payroll') }}" @click="open = false" class="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 text-gray-900 hover:bg-gray-50">Pagos de Nómina</a>
-                                    </div>
+                                <a href="{{ route('home') }}" class="-mx-3 block rounded-xl px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50 hover:text-primary-600">Inicio</a>
+                                <div class="py-2">
+                                    <p class="px-3 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Soluciones</p>
+                                    <a href="{{ route('products.personnel') }}" class="-mx-3 block rounded-xl px-3 py-2 text-base font-medium leading-7 text-gray-600 hover:bg-blue-50 hover:text-blue-600">Gestión de Personal</a>
+                                    <a href="{{ route('products.contracts') }}" class="-mx-3 block rounded-xl px-3 py-2 text-base font-medium leading-7 text-gray-600 hover:bg-emerald-50 hover:text-emerald-600">Contratos Digitales</a>
+                                    <a href="{{ route('products.payroll') }}" class="-mx-3 block rounded-xl px-3 py-2 text-base font-medium leading-7 text-gray-600 hover:bg-indigo-50 hover:text-indigo-600">Nómina Automática</a>
+                                    <a href="{{ route('products.timesheets') }}" class="-mx-3 block rounded-xl px-3 py-2 text-base font-medium leading-7 text-gray-600 hover:bg-purple-50 hover:text-purple-600">Control de Asistencia</a>
                                 </div>
+                                <a href="{{ route('about') }}" class="-mx-3 block rounded-xl px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50 hover:text-primary-600">Sobre Nosotros</a>
                             </div>
-                            <!-- Botón Iniciar Sesión (Móvil) -->
                             <div class="py-6">
-                                @if (Route::has('login'))
-                                    @auth
-                                        <a href="{{ url('/dashboard') }}" class="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">Dashboard</a>
-                                    @else
-                                        <a href="{{ route('login') }}" class="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">Iniciar Sesión</a>
-                                    @endauth
-                                @endif
+                                <a href="{{ route('login') }}" class="-mx-3 block rounded-xl px-3 py-3 text-base font-bold leading-7 text-white bg-gradient-to-r from-primary-600 to-emerald-600 text-center shadow-lg">Iniciar Sesión</a>
                             </div>
                         </div>
                     </div>
@@ -202,21 +187,103 @@
             </div>
         </header>
 
-        <!-- 2. CONTENIDO PRINCIPAL (DE CADA PÁGINA) -->
-        <main>
+        <!-- 2. CONTENIDO PRINCIPAL -->
+        <main class="flex-grow">
             @yield('content')
         </main>
 
-        <!-- 3. FOOTER (PIE DE PÁGINA) -->
-        <footer class="bg-white">
-            <div class="mx-auto max-w-7xl px-6 py-12 lg:px-8">
-                <div class="mt-8 border-t border-gray-900/10 pt-8">
-                    <p class="text-center text-xs leading-5 text-gray-500">
-                        &copy; 2025 HR-System. Un proyecto de práctica con Laravel.
-                    </p>
+        <!-- 3. FOOTER (MEGA FOOTER OSCURO) -->
+        <!-- Fondo gris muy oscuro (bg-gray-900) con texto blanco/gris claro para contraste -->
+        <footer class="bg-gray-900 text-white mt-24 relative" aria-labelledby="footer-heading">
+            
+            <h2 id="footer-heading" class="sr-only">Footer</h2>
+            
+            <div class="mx-auto max-w-7xl px-6 pb-12 pt-20 lg:px-8">
+                <div class="xl:grid xl:grid-cols-4 xl:gap-12">
+                    
+                    <!-- COLUMNA 1: MARCA Y REDES -->
+                    <div class="space-y-8 xl:col-span-1">
+                        <a href="{{ route('home') }}" class="flex items-center gap-3">
+                            <div class="bg-white/10 p-2 rounded-xl backdrop-blur-sm border border-white/10">
+                                <svg class="h-8 w-8 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                </svg>
+                            </div>
+                            <span class="text-2xl font-bold text-white tracking-tight">HR-System</span>
+                        </a>
+                        <p class="text-base leading-7 text-gray-400">
+                            La plataforma integral para digitalizar y optimizar tu departamento de recursos humanos.
+                        </p>
+                        <!-- Redes Sociales -->
+                        <div class="flex space-x-6">
+                            <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                                <span class="sr-only">Facebook</span>
+                                <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd" /></svg>
+                            </a>
+                            <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                                <span class="sr-only">X</span>
+                                <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M13.6823 10.6218L20.2391 3H18.6854L12.9921 9.61788L8.44486 3H3.2002L10.0765 13.0074L3.2002 21H4.75404L10.7663 14.0113L15.5685 21H20.8131L13.6819 10.6218H13.6823ZM11.5541 13.0956L10.8574 12.0991L5.31391 4.16971H7.70053L12.1742 10.5689L12.8709 11.5655L18.6861 19.8835H16.2995L11.5541 13.096V13.0956Z" /></svg>
+                            </a>
+                            <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                                <span class="sr-only">LinkedIn</span>
+                                <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" clip-rule="evenodd" /></svg>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- COLUMNA 2: SOLUCIONES -->
+                    <div class="mt-16 xl:mt-0">
+                        <h3 class="text-base font-semibold leading-6 text-white tracking-wider uppercase mb-6">Soluciones</h3>
+                        <ul role="list" class="space-y-4">
+                            <li><a href="{{ route('products.personnel') }}" class="text-base leading-6 text-gray-400 hover:text-primary-400 transition-colors">Gestión de Personal</a></li>
+                            <li><a href="{{ route('products.contracts') }}" class="text-base leading-6 text-gray-400 hover:text-primary-400 transition-colors">Contratos Digitales</a></li>
+                            <li><a href="{{ route('products.payroll') }}" class="text-base leading-6 text-gray-400 hover:text-primary-400 transition-colors">Nómina Automática</a></li>
+                            <li><a href="{{ route('products.timesheets') }}" class="text-base leading-6 text-gray-400 hover:text-primary-400 transition-colors">Control de Asistencia</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- COLUMNA 3: COMPAÑÍA -->
+                    <div class="mt-16 xl:mt-0">
+                        <h3 class="text-base font-semibold leading-6 text-white tracking-wider uppercase mb-6">Compañía</h3>
+                        <ul role="list" class="space-y-4">
+                            <li><a href="{{ route('about') }}" class="text-base leading-6 text-gray-400 hover:text-primary-400 transition-colors">Sobre Nosotros</a></li>
+                            <li><a href="#" class="text-base leading-6 text-gray-400 hover:text-primary-400 transition-colors">Blog</a></li>
+                            <li><a href="#" class="text-base leading-6 text-gray-400 hover:text-primary-400 transition-colors">Carreras</a></li>
+                            <li><a href="#" class="text-base leading-6 text-gray-400 hover:text-primary-400 transition-colors">Prensa</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- COLUMNA 4: CONTACTO -->
+                    <div class="mt-16 xl:mt-0">
+                        <h3 class="text-base font-semibold leading-6 text-white tracking-wider uppercase mb-6">Contacto</h3>
+                        <ul role="list" class="space-y-4">
+                            <li class="flex items-start gap-3">
+                                <svg class="h-6 w-6 text-primary-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                                <span class="text-base leading-6 text-gray-400">soporte@hr-system.com</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <svg class="h-6 w-6 text-primary-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                                <span class="text-base leading-6 text-gray-400">+52 (55) 1234-5678</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <svg class="h-6 w-6 text-primary-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                <span class="text-base leading-6 text-gray-400">Torre Reforma, Piso 25<br>Ciudad de México, MX</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mt-16 border-t border-white/10 pt-8 sm:mt-20 lg:mt-24">
+                    <div class="md:flex md:items-center md:justify-between">
+                        <p class="text-sm leading-5 text-gray-500">&copy; 2025 HR-System. Todos los derechos reservados.</p>
+                        <div class="mt-4 md:order-1 md:mt-0 flex gap-6 text-sm text-gray-400">
+                            <a href="#" class="hover:text-white transition-colors">Privacidad</a>
+                            <a href="#" class="hover:text-white transition-colors">Términos</a>
+                            <a href="#" class="hover:text-white transition-colors">Cookies</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </footer>
-
     </body>
 </html>

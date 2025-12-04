@@ -183,7 +183,7 @@
                             
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left text-gray-500 dark:text-gray-400">
-                                    <thead class="text-sm text-white uppercase bg-primary-600 dark:bg-primary-900/50 font-bold tracking-wider">
+                                    <thead class="text-sm text-white uppercase bg-primary-600 dark:bg-primary-90 font-bold tracking-wider">
                                         <tr>
                                             <th scope="col" class="px-6 py-4 rounded-l-lg">Empleado</th>
                                             <th scope="col" class="px-6 py-4">Puesto</th>

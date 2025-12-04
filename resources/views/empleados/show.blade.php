@@ -32,7 +32,7 @@
         <!-- 1. BANNER Y TARJETA PRINCIPAL -->
         <div class="relative mb-12">
             <!-- Fondo Azul Degradado -->
-            <div class="h-48 w-full bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-900 dark:to-purple-900 rounded-b-[3rem] shadow-md absolute top-0 left-0 z-0"></div>
+            <div class="h-48 w-full bg-gradient-to-r from-teal-800 to-emerald-400 dark:from-teal-800 to-emerald-400 rounded-b-[3rem] shadow-md absolute top-0 left-0 z-0"></div>
             
             <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24">
                 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden border border-gray-100 dark:border-gray-700">
@@ -103,7 +103,7 @@
                     <div class="overflow-x-auto rounded-xl border border-gray-100 dark:border-gray-700">
                         <table class="w-full text-left text-gray-500 dark:text-gray-400">
                             <!-- HEADER VERDE (SOLICITADO) -->
-                            <thead class="text-sm text-white uppercase bg-primary-600 dark:bg-primary-900/50 font-bold tracking-wider">
+                            <thead class="text-sm text-white uppercase bg-primary-600 dark:bg-primary-90 font-bold tracking-wider">
                                 <tr>
                                     <th class="px-6 py-4">Tipo</th>
                                     <th class="px-6 py-4">Salario</th>
@@ -215,7 +215,7 @@
                     <div class="overflow-x-auto rounded-xl border border-gray-100 dark:border-gray-700">
                         <table class="w-full text-left text-gray-500 dark:text-gray-400">
                             <!-- HEADER VERDE (SOLICITADO) -->
-                            <thead class="text-sm text-white uppercase bg-primary-600 dark:bg-primary-900/50 font-bold tracking-wider">
+                            <thead class="text-sm text-white uppercase bg-primary-600 dark:bg-primary-90 font-bold tracking-wider">
                                 <tr>
                                     <th class="px-6 py-4">Fechas</th>
                                     <th class="px-6 py-4">Motivo</th>
