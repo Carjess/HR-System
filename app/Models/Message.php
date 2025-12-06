@@ -10,9 +10,7 @@ class Message extends Model
     use HasFactory;
 
     /**
-     * Los atributos que son asignables masivamente.
-     *
-     * @var array<int, string>
+     * Los atributos que se pueden asignar masivamente.
      */
     protected $fillable = [
         'sender_id',
@@ -24,7 +22,16 @@ class Message extends Model
     ];
 
     /**
-     * Obtener el usuario que envió el mensaje.
+     * Conversión automática de tipos.
+     */
+    protected $casts = [
+        'is_read' => 'boolean',
+        'allow_reply' => 'boolean',
+        'created_at' => 'datetime',
+    ];
+
+    /**
+     * Relación: Usuario que envía el mensaje.
      */
     public function sender()
     {
@@ -32,7 +39,7 @@ class Message extends Model
     }
 
     /**
-     * Obtener el usuario que recibió el mensaje.
+     * Relación: Usuario que recibe el mensaje.
      */
     public function receiver()
     {

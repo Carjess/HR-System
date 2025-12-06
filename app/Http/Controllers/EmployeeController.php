@@ -11,12 +11,73 @@ use App\Models\Department;
 use App\Models\ContractType;
 use App\Models\Message; 
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon; // Importante para fechas
 
 class EmployeeController extends Controller
 {
+    /**
+     * Muestra el portal principal del empleado logueado (Self-Service).
+     * Este es el "Dashboard" personal del empleado.
+     */
+    public function portal()
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        
+        // 1. Cargar relaciones necesarias para la vista rápida
+        $user->load('position.department');
+
+        // 2. Obtener últimas solicitudes de ausencia (Para la tabla de resumen)
+        // Se asume que la relación en el modelo User se llama 'leaveRequests'
+        $leaveRequests = $user->leaveRequests()
+            ->latest()
+            ->take(5) // Mostramos las últimas 5
+            ->get();
+        
+        // 3. Calcular horas trabajadas este mes (Para la tarjeta de resumen)
+        // Se asume que la relación en el modelo User se llama 'timesheets'
+        $hoursThisMonth = $user->timesheets()
+            ->whereMonth('date', Carbon::now()->month)
+            ->whereYear('date', Carbon::now()->year)
+            ->sum('hours_worked');
+
+        // Retornamos la nueva vista "home-empleado"
+        return view('empleados.home-empleado', compact('user', 'leaveRequests', 'hoursThisMonth'));
+    }
 
     /**
-     * Muestra la lista de empleados con filtros y paginación.
+     * Muestra la lista completa de ausencias de un empleado específico.
+     * Usada en la sección "Mis Ausencias".
+     */
+    public function misAusencias(Request $request, User $empleado)
+    {
+        // Seguridad: Asegurarse de que el usuario solo vea sus propias ausencias 
+        // (a menos que sea admin, pero esta vista es pensada para el empleado)
+        if (auth()->user()->id !== $empleado->id && !auth()->user()->can('is-admin')) {
+            abort(403, 'No tienes permiso para ver estas ausencias.');
+        }
+
+        // Iniciar consulta sobre las ausencias del empleado
+        $query = $empleado->leaveRequests()->latest();
+
+        // Filtro por búsqueda (motivo)
+        if ($request->filled('search')) {
+            $query->where('reason', 'like', '%' . $request->search . '%');
+        }
+
+        // Filtro por tipo
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        // Paginación
+        $ausencias = $query->paginate(10);
+
+        return view('empleados.ausencia', compact('empleado', 'ausencias'));
+    }
+
+    /**
+     * Muestra la lista de empleados con filtros y paginación (Vista Admin).
      */
     public function index(Request $request)
     {
@@ -44,7 +105,7 @@ class EmployeeController extends Controller
     }
 
     /**
-     * Muestra el formulario de creación (aunque ahora usamos modal, se mantiene por si acaso).
+     * Muestra el formulario de creación.
      */
     public function create()
     {
@@ -89,7 +150,7 @@ class EmployeeController extends Controller
     }
 
     /**
-     * Muestra el perfil del empleado.
+     * Muestra el perfil del empleado (Vista 360).
      */
     public function show(User $empleado)
     {
@@ -99,7 +160,7 @@ class EmployeeController extends Controller
         // Cargamos los tipos de contrato para el modal
         $contractTypes = ContractType::all();
 
-        // --- NUEVO: Cargar historial de chat para el widget flotante ---
+        // --- Cargar historial de chat para el widget flotante ---
         $messages = Message::where(function($q) use ($empleado) {
                 $q->where('sender_id', Auth::id())
                   ->where('receiver_id', $empleado->id);
@@ -115,7 +176,7 @@ class EmployeeController extends Controller
     }
 
     /**
-     * Muestra el formulario de edición (usado por el modal en index).
+     * Muestra el formulario de edición.
      */
     public function edit(User $empleado)
     {

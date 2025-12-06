@@ -135,7 +135,7 @@
                             <a href="{{ url('/dashboard') }}" 
                                class="text-sm font-bold leading-6 transition-colors flex items-center gap-1"
                                :class="scrolled ? 'text-primary-700 hover:text-primary-900' : 'text-white hover:text-primary-200'">
-                                Ir al Dashboard <span aria-hidden="true">&rarr;</span>
+                                Ir al Dashboard <span aria-hidden="true"></span>
                             </a>
                         @else
                             <a href="{{ route('login') }}" 

@@ -11,27 +11,26 @@ use App\Models\Department;
 use App\Models\Position;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth; 
+// Quitamos el 'use' problemático y lo llamamos directo abajo
 
 class PayrollController extends Controller
 {
     /**
-     * Muestra la página de generación de nómina y el historial.
+     * Muestra la página de generación de nómina y el historial (ADMIN).
      */
     public function index()
     {
-        // 1. Obtenemos departamentos para el filtro
         $departments = Department::orderBy('name')->get();
 
-        // 2. Historial de nóminas
-        // Agrupamos por periodo para mostrar "lotes" de pago
         $payrollHistory = Payslip::select(
                 'pay_period_start',
                 'pay_period_end',
-                'notes', // <-- Traemos también la nota para mostrarla en detalles
+                'notes', 
                 DB::raw('count(*) as total_employees'),
                 DB::raw('sum(net_pay) as total_amount')
             )
-            ->groupBy('pay_period_start', 'pay_period_end', 'notes') // Agrupamos también por nota
+            ->groupBy('pay_period_start', 'pay_period_end', 'notes') 
             ->orderBy('pay_period_start', 'desc')
             ->paginate(5);
 
@@ -39,30 +38,45 @@ class PayrollController extends Controller
     }
 
     /**
-     * Genera la nómina (Pago de Nómina).
+     * Muestra la lista de recibos de nómina de un empleado específico.
+     */
+    public function misRecibos(Request $request, User $empleado)
+    {
+        $user = Auth::user();
+        
+        if ($user->id !== $empleado->id && !$user->can('is-admin')) {
+            abort(403, 'No tienes permiso para ver estos recibos.');
+        }
+
+        $payslips = $empleado->payslips()
+            ->orderBy('pay_period_start', 'desc')
+            ->paginate(10);
+
+        return view('empleados.recibos', compact('empleado', 'payslips'));
+    }
+
+    /**
+     * Genera la nómina (Pago de Nómina) - ADMIN.
      */
     public function generate(Request $request)
     {
-        // 1. Validar la entrada
         $request->validate([
             'month' => 'required|integer|min:1|max:12',
             'year' => 'required|integer|min:2020|max:2030',
             'department_id' => 'nullable|exists:departments,id',
             'position_id'   => 'nullable|exists:positions,id',
-            'notes'         => 'nullable|string|max:500', // <-- Validación para el mensaje
+            'notes'         => 'nullable|string|max:500', 
         ]);
 
         $month = $request->month;
         $year = $request->year;
         $departmentId = $request->department_id;
         $positionId = $request->position_id;
-        $notes = $request->notes; // Capturamos el mensaje
+        $notes = $request->notes; 
 
-        // 2. Definir el período de pago
         $startDate = Carbon::create($year, $month, 1)->startOfMonth();
         $endDate = Carbon::create($year, $month, 1)->endOfMonth();
 
-        // 3. SEGURIDAD: Verificar si ya existen pagos para este grupo
         $existingQuery = Payslip::whereBetween('pay_period_start', [$startDate, $endDate]);
 
         if ($departmentId) {
@@ -77,16 +91,10 @@ class PayrollController extends Controller
         }
 
         if ($existingQuery->exists()) {
-            $target = "la selección actual";
-            if($departmentId) $target = Department::find($departmentId)->name;
-            if($positionId) $target .= " (" . Position::find($positionId)->name . ")";
-
             return redirect()->route('payroll.index')
-                ->with('error', "Error de Seguridad: Ya existen pagos registrados para $target en $month/$year.");
+                ->with('error', "Error: Ya existen pagos registrados para este periodo.");
         }
 
-
-        // 4. Obtener los empleados a pagar
         $employeesQuery = User::query();
 
         if ($departmentId) {
@@ -101,10 +109,7 @@ class PayrollController extends Controller
         $employees = $employeesQuery->get();
         $payslipsGenerated = 0;
 
-
-        // 5. Procesar Nómina
         foreach ($employees as $employee) {
-
             $contract = $employee->contracts()
                 ->where('start_date', '<=', $endDate)
                 ->where(function($query) use ($startDate) {
@@ -113,20 +118,17 @@ class PayrollController extends Controller
                 })
                 ->first();
 
-            if (!$contract) continue;
+            if (!$contract) continue; 
 
-            // Calcular horas
             $totalHours = $employee->timesheets()
                 ->whereBetween('date', [$startDate, $endDate])
                 ->sum('hours_worked');
 
-            // Cálculos
             $baseSalary = $contract->salary;
             $bonuses = 0;
-            $deductions = $baseSalary * 0.10;
+            $deductions = $baseSalary * 0.10; 
             $netPay = ($baseSalary + $bonuses) - $deductions;
             
-            // Crear recibo CON LA NOTA
             Payslip::create([
                 'employee_id' => $employee->id,
                 'pay_period_start' => $startDate,
@@ -136,16 +138,36 @@ class PayrollController extends Controller
                 'bonuses' => $bonuses,
                 'deductions' => $deductions,
                 'net_pay' => $netPay,
-                'notes' => $notes, // <-- Guardamos el mensaje aquí
+                'notes' => $notes,
             ]);
 
             $payslipsGenerated++;
         }
 
         if ($payslipsGenerated == 0) {
-            return redirect()->route('payroll.index')->with('error', "No se encontraron empleados aptos para pago en esta selección.");
+            return redirect()->route('payroll.index')->with('error', "No se encontraron empleados aptos para pago.");
         }
 
-        return redirect()->route('payroll.index')->with('status', "¡Éxito! Se generaron $payslipsGenerated recibos de nómina.");
+        return redirect()->route('payroll.index')->with('status', "¡Éxito! Se generaron $payslipsGenerated recibos.");
+    }
+
+    /**
+     * Descargar el recibo en PDF.
+     */
+    public function download(Payslip $payslip)
+    {
+        $user = Auth::user();
+        if ($user->role !== 'admin' && $user->id !== $payslip->employee_id) {
+            abort(403, 'No tienes permiso para ver este recibo.');
+        }
+
+        $payslip->load('employee.position.department');
+
+        // CORRECCIÓN: Usamos la clase completa con barra invertida inicial para evitar problemas de alias
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.payslip', compact('payslip'));
+        
+        $pdf->setPaper('letter', 'portrait');
+
+        return $pdf->download('Recibo_Nomina_' . $payslip->employee->name . '_' . $payslip->pay_period_start . '.pdf');
     }
 }

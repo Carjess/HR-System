@@ -6,26 +6,40 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
-        Schema::create('messages', function (Blueprint $table) {
-            $table->id();
-            
-            // Quién envía y quién recibe
-            $table->foreignId('sender_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('receiver_id')->constrained('users')->onDelete('cascade');
-            
-            $table->string('subject'); // Asunto
-            $table->text('body'); // El mensaje
-            
-            // Opciones
-            $table->boolean('is_read')->default(false); // ¿Ya lo leyó?
-            $table->boolean('allow_reply')->default(true); // ¿Permitir respuesta?
-            
-            $table->timestamps();
-        });
+        // Verificamos si la tabla no existe para evitar errores
+        if (!Schema::hasTable('messages')) {
+            Schema::create('messages', function (Blueprint $table) {
+                $table->id();
+                
+                // Relaciones
+                $table->foreignId('sender_id')->constrained('users')->onDelete('cascade');   // Quien envía
+                $table->foreignId('receiver_id')->constrained('users')->onDelete('cascade'); // Quien recibe
+                
+                // Contenido
+                $table->string('subject')->nullable()->default('Chat'); // Asunto (opcional)
+                $table->text('body'); // El mensaje
+                
+                // Estados
+                $table->boolean('is_read')->default(false); // ¿Leído?
+                $table->boolean('allow_reply')->default(true); // ¿Permite respuesta?
+                
+                $table->timestamps();
+                
+                // Índices para velocidad (IMPORTANTE PARA CHAT)
+                $table->index(['sender_id', 'receiver_id']);
+                $table->index('is_read');
+            });
+        }
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::dropIfExists('messages');

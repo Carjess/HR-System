@@ -16,15 +16,23 @@
     </style>
 
     <!-- 
-      Ajuste de márgenes para que el banner toque los bordes 
+      Ajuste de márgenes y ESTADO ALPINE para todos los modales 
     -->
-    <div class="pb-12 relative -mt-4 -mx-4" x-data="{ showContractModal: false }">
+    <div class="pb-12 relative -mt-4 -mx-4" x-data="{ showContractModal: false, showLeaveModal: false, showTimesheetModal: false }">
         
         <!-- Mensaje de Éxito -->
         @if (session('status'))
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-                <div class="p-4 bg-green-100 text-green-800 text-base border border-green-300 rounded-xl shadow-sm dark:bg-green-900/50 dark:text-green-300 dark:border-green-800">
-                    {{ session('status') }}
+            <div x-data="{ show: true }"
+                x-show="show"
+                x-init="setTimeout(()=> show = false, 4000)"
+                x-transition
+                class="fixed right-4 bottom-4 z-50">
+                <div class="max-w-xs w-full bg-emerald-600 text-white rounded-lg shadow-lg border border-emerald-700 p-3 flex items-start gap-3">
+                    <svg class="w-5 h-5 text-white mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M12 19a7 7 0 100-14 7 7 0 000 14z"/></svg>
+                    <div class="text-sm font-medium leading-tight">
+                        {{ session('status') }}
+                    </div>
+                    <button @click="show = false" class="ml-3 text-white/80 hover:text-white text-sm">✕</button>
                 </div>
             </div>
         @endif
@@ -102,7 +110,6 @@
                     
                     <div class="overflow-x-auto rounded-xl border border-gray-100 dark:border-gray-700">
                         <table class="w-full text-left text-gray-500 dark:text-gray-400">
-                            <!-- HEADER VERDE (SOLICITADO) -->
                             <thead class="text-sm text-white uppercase bg-primary-600 dark:bg-primary-90 font-bold tracking-wider">
                                 <tr>
                                     <th class="px-6 py-4">Tipo</th>
@@ -144,7 +151,11 @@
                     <div class="p-8 flex flex-col h-full">
                         <div class="flex justify-between items-center mb-6">
                             <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2"><div class="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-lg text-blue-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div> Horas</h3>
-                            <a href="{{ route('timesheets.create', $empleado->id) }}" class="btn-anim bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-xl text-sm shadow-md">Registrar</a>
+                            
+                            <!-- BOTÓN "REGISTRAR" AHORA ABRE MODAL -->
+                            <button @click="showTimesheetModal = true" class="btn-anim bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-xl text-sm shadow-md">
+                                Registrar
+                            </button>
                         </div>
                         <div class="flex-grow overflow-auto max-h-96 rounded-xl border border-gray-100 dark:border-gray-700">
                             <table class="w-full text-left text-gray-500 dark:text-gray-400">
@@ -202,19 +213,22 @@
                 </div>
             </div>
 
-            <!-- SECCIÓN 5: Ausencias -->
+            <!-- SECCIÓN 5: Ausencias (Limitado a 5) -->
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-2xl border border-gray-200 dark:border-gray-700">
                 <div class="p-8">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                            <div class="p-2 bg-orange-100 dark:bg-orange-900/50 rounded-lg text-orange-600"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div> Mis Ausencias
+                            <div class="p-2 bg-orange-100 dark:bg-orange-900/50 rounded-lg text-orange-600"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div> Últimas Ausencias
                         </h3>
-                        <a href="{{ route('ausencias.create', $empleado->id) }}" class="btn-anim bg-orange-500 hover:bg-orange-600 text-white font-bold py-2.5 px-5 rounded-xl shadow-md transition-colors text-sm">Solicitar</a>
+                        
+                        <!-- BOTÓN "SOLICITAR" AHORA ABRE MODAL -->
+                        <button @click="showLeaveModal = true" class="btn-anim bg-orange-500 hover:bg-orange-600 text-white font-bold py-2.5 px-5 rounded-xl shadow-md transition-colors text-sm">
+                            Solicitar
+                        </button>
                     </div>
                     
                     <div class="overflow-x-auto rounded-xl border border-gray-100 dark:border-gray-700">
                         <table class="w-full text-left text-gray-500 dark:text-gray-400">
-                            <!-- HEADER VERDE (SOLICITADO) -->
                             <thead class="text-sm text-white uppercase bg-primary-600 dark:bg-primary-90 font-bold tracking-wider">
                                 <tr>
                                     <th class="px-6 py-4">Fechas</th>
@@ -224,7 +238,8 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                                @forelse ($empleado->leaveRequests->sortByDesc('created_at') as $request)
+                                <!-- Se aplica el límite de 5 -->
+                                @forelse ($empleado->leaveRequests->sortByDesc('created_at')->take(5) as $request)
                                     <tr class="bg-white dark:bg-gray-800 row-card transition-colors hover:bg-gray-50" x-data="{ showModal: false }">
                                         <td class="px-6 py-5 font-medium text-gray-900 dark:text-white">{{ \Carbon\Carbon::parse($request->start_date)->format('d M') }} - {{ \Carbon\Carbon::parse($request->end_date)->format('d M') }}</td>
                                         <td class="px-6 py-5 truncate max-w-xs">{{ $request->reason ?? '-' }}</td>
@@ -255,6 +270,13 @@
                             </tbody>
                         </table>
                     </div>
+                    
+                    <!-- Botón "Ver Historial" si hay más de 5 -->
+                    @if($empleado->leaveRequests->count() > 5)
+                    <div class="mt-4 text-center border-t border-gray-100 dark:border-gray-700 pt-4">
+                        <a href="#" class="text-sm font-bold text-primary-600 hover:text-primary-800 transition-colors">Ver historial completo de ausencias &rarr;</a>
+                    </div>
+                    @endif
                 </div>
             </div>
 
@@ -280,6 +302,64 @@
             </div>
         </div>
         @endcan
+
+        <!-- ==================== MODAL SOLICITAR AUSENCIA ==================== -->
+        <div x-show="showLeaveModal" style="display: none;" x-cloak 
+             class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 backdrop-blur-sm p-4 transition-opacity">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-100" @click.away="showLeaveModal = false">
+                <div class="bg-purple-600 p-6 flex justify-between items-center">
+                    <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                        Solicitar Ausencia
+                    </h3>
+                    <button @click="showLeaveModal = false" class="text-purple-100 hover:text-white transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                <form action="{{ route('ausencias.store', $empleado->id) }}" method="POST" class="p-6">
+                    @csrf
+                    <input type="hidden" name="user_id" value="{{ $empleado->id }}">
+                    <div class="space-y-4">
+                        <div><label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Tipo de Ausencia</label><select name="type" class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"><option value="vacaciones">Vacaciones</option><option value="medico">Cita Médica</option><option value="personal">Asunto Personal</option><option value="enfermedad">Enfermedad</option></select></div>
+                        <div class="grid grid-cols-2 gap-4"><div><label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Desde</label><input type="date" name="start_date" class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required></div><div><label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Hasta</label><input type="date" name="end_date" class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required></div></div>
+                        <div><label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Motivo / Comentario</label><textarea name="reason" rows="3" placeholder="Explica brevemente el motivo..." class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required></textarea></div>
+                    </div>
+                    <div class="mt-6 flex justify-end gap-3">
+                        <button type="button" @click="showLeaveModal = false" class="px-4 py-2 text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 font-bold transition-colors dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">Cancelar</button>
+                        <button type="submit" class="px-6 py-2 bg-purple-600 text-white rounded-xl hover:bg-purple-700 font-bold shadow-lg transition-colors">Enviar Solicitud</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ==================== MODAL REGISTRAR HORAS ==================== -->
+        <div x-show="showTimesheetModal" style="display: none;" x-cloak 
+             class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 backdrop-blur-sm p-4 transition-opacity">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-100" @click.away="showTimesheetModal = false">
+                <div class="bg-blue-600 p-6 flex justify-between items-center">
+                    <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Registrar Horas
+                    </h3>
+                    <button @click="showTimesheetModal = false" class="text-blue-100 hover:text-white transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                <form action="{{ route('timesheets.store', $empleado->id) }}" method="POST" class="p-6">
+                    @csrf
+                    <input type="hidden" name="user_id" value="{{ $empleado->id }}">
+                    <div class="space-y-4">
+                        <div><label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Fecha</label><input type="date" name="date" value="{{ date('Y-m-d') }}" class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required></div>
+                        <div><label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Horas Trabajadas</label><input type="number" step="0.5" min="0" max="24" name="hours_worked" placeholder="Ej: 8" class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required></div>
+                        <div><label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Descripción / Proyecto</label><textarea name="description" rows="3" placeholder="¿Qué hiciste hoy?" class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"></textarea></div>
+                    </div>
+                    <div class="mt-6 flex justify-end gap-3">
+                        <button type="button" @click="showTimesheetModal = false" class="px-4 py-2 text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 font-bold transition-colors dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">Cancelar</button>
+                        <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-bold shadow-lg transition-colors">Guardar Registro</button>
+                    </div>
+                </form>
+            </div>
+        </div>
 
     </div>
 

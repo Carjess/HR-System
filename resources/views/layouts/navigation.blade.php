@@ -19,19 +19,14 @@
         <!-- Logo / Nombre -->
         <div class="flex items-center justify-center w-full" x-show="sidebarOpen" x-transition.opacity.duration.200ms>
             <a href="{{ route('dashboard') }}" class="block">
-                
                 <img src="{{ asset('img/rh_green.png') }}" 
                      alt="Logo HR-System" 
-                     class="h-16 w-aut block dark:hidden">
-
+                     class="h-16 w-auto block dark:hidden">
                 <img src="{{ asset('img/rh_white.jpg') }}" 
                      alt="Logo HR-System" 
                      class="h-16 w-auto hidden dark:block">
             </a>
         </div>
-
-        <!-- Logo Solo (Cerrado) -->
-        
 
         <!-- Botón Alternar -->
         <button @click="sidebarOpen = !sidebarOpen" 
@@ -49,9 +44,9 @@
         <p x-show="sidebarOpen" x-transition class="px-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2 mt-1">Principal</p>
 
         <!-- DASHBOARD -->
-        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" x-bind:class="sidebarOpen ? '' : 'justify-center'">
+        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard') || request()->routeIs('employee.portal')" x-bind:class="sidebarOpen ? '' : 'justify-center'">
             <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-            <span x-show="sidebarOpen" x-cloak class="ml-3 font-medium whitespace-nowrap">Dashboard</span>
+            <span x-show="sidebarOpen" x-cloak class="ml-3 font-medium whitespace-nowrap">Inicio</span>
         </x-nav-link>
 
         <!-- MENSAJERÍA -->
@@ -66,6 +61,7 @@
             <span x-show="sidebarOpen" x-cloak class="ml-3 font-medium whitespace-nowrap">Calendario</span>
         </x-nav-link>
 
+        <!-- ZONA ADMIN -->
         @can('is-admin')
             <div x-show="sidebarOpen" class="my-4 border-t border-gray-100 dark:border-gray-800"></div>
             <p x-show="sidebarOpen" x-transition class="px-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Gestión</p>
@@ -77,7 +73,7 @@
 
             <x-nav-link :href="route('ausencias.index')" :active="request()->routeIs('ausencias.*')" x-bind:class="sidebarOpen ? '' : 'justify-center'">
                 <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                <span x-show="sidebarOpen" x-cloak class="ml-3 font-medium whitespace-nowrap">Ausencias</span>
+                <span x-show="sidebarOpen" x-cloak class="ml-3 font-medium whitespace-nowrap">Ausencias </span>
             </x-nav-link>
 
             <x-nav-link :href="route('payroll.index')" :active="request()->routeIs('payroll.*')" x-bind:class="sidebarOpen ? '' : 'justify-center'">
@@ -99,11 +95,31 @@
             </x-nav-link>
         @endcan
         
-        @if(auth()->user()->role === 'employee')
+        <!-- ZONA EMPLEADO -->
+        @if(auth()->user()->role === 'employee' || !auth()->user()->can('is-admin'))
+            <div x-show="sidebarOpen" class="my-4 border-t border-gray-100 dark:border-gray-800"></div>
+            <p x-show="sidebarOpen" x-transition class="px-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Personal</p>
+
+            <!-- NUEVA SECCIÓN: MIS AUSENCIAS -->
+            <!-- Nota: Asumo la ruta 'empleados.ausencias'. Debes crearla en web.php apuntando a una función index en EmployeeController -->
+            <x-nav-link :href="route('empleados.ausencias.list', auth()->user()->id)" :active="request()->routeIs('empleados.ausencias.*')" x-bind:class="sidebarOpen ? '' : 'justify-center'">
+                <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span x-show="sidebarOpen" x-cloak class="ml-3 font-medium whitespace-nowrap">Mis Ausencias</span>
+            </x-nav-link>
+
+          
+            <!-- NUEVA SECCIÓN: MIS RECIBOS -->
+            <x-nav-link :href="route('empleados.recibos.list', auth()->user()->id)" :active="request()->routeIs('empleados.recibos.*')" x-bind:class="sidebarOpen ? '' : 'justify-center'">
+                <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                <span x-show="sidebarOpen" x-cloak class="ml-3 font-medium whitespace-nowrap">Mis Recibos</span>
+            </x-nav-link>
+
+            <!-- MI PERFIL -->
             <x-nav-link :href="route('empleados.show', auth()->user()->id)" :active="request()->routeIs('empleados.show')" x-bind:class="sidebarOpen ? '' : 'justify-center'">
                 <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                 <span x-show="sidebarOpen" x-cloak class="ml-3 font-medium whitespace-nowrap">Mi Perfil</span>
             </x-nav-link>
+            
         @endif
 
     </div>
@@ -150,11 +166,7 @@
             </div>
         </div>
 
-        <!-- BOTÓN PRINCIPAL -->
-        <button @click="configOpen = !configOpen" 
-                class="flex items-center w-full p-2.5 rounded-xl transition-colors duration-200 group hover:bg-white dark:hover:bg-gray-800 hover:shadow-sm hover:border-gray-200 dark:hover:border-gray-700"
-                :class="sidebarOpen ? '' : 'justify-center'"
-                title="Configuración">
+        
             
             <!-- BOTÓN PRINCIPAL (ENGRANAJE REAL) -->
         <button @click="configOpen = !configOpen" 

@@ -8,13 +8,14 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany; // IMPORTANTE: Agregado para las relaciones
 
+// Modelos explícitos (Restaurados)
 use App\Models\Position;
 use App\Models\Contract;
 use App\Models\Timesheet;
 use App\Models\LeaveRequest;
 use App\Models\Payslip;
 use App\Models\EmployeeSchedule;
-use App\Models\Message; // Aseguramos que reconozca el modelo Message
+use App\Models\Message; 
 
 class User extends Authenticatable
 {
@@ -33,6 +34,14 @@ class User extends Authenticatable
     {
         // Un empleado TIENE MUCHOS contratos (historial)
         return $this->hasMany(Contract::class, 'employee_id');
+    }
+    
+    /**
+     * El contrato actual/activo (Opcional, útil para atajos).
+     */
+    public function currentContract()
+    {
+        return $this->hasOne(Contract::class)->latestOfMany();
     }
 
     /**
@@ -96,7 +105,7 @@ class User extends Authenticatable
     public function messages()
     {
         // Retorna una relación base sobre los mensajes enviados, pero añade la condición OR
-        // para incluir también los recibidos. Esto permite usar whereHas('messages')
+        // para incluir también los recibidos.
         return $this->hasMany(Message::class, 'sender_id')->orWhere('receiver_id', $this->id);
     }
 
@@ -111,10 +120,12 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role', // Asegúrate de que 'role' esté aquí si usas roles simples
         'telefono',
         'direccion',
         'fecha_contratacion',
         'position_id',
+        'is_active'
     ];
 
     /**
@@ -137,6 +148,14 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'fecha_contratacion' => 'date',
+            'is_active' => 'boolean',
         ];
+    }
+
+    // Helper para verificar admin (útil en blade)
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
     }
 }
