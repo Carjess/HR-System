@@ -162,6 +162,7 @@ class MessageController extends Controller
     public function closeChat()
     {
         session()->forget('active_chat_user_id');
+        session()->save();
         return response()->json(['status' => 'closed']);
     }
     
