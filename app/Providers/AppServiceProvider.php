@@ -3,9 +3,9 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-// --- IMPORTACIONES NECESARIAS (Antes faltaban estas) ---
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\URL;
 use App\Models\User;
 use App\Models\Message;
 
@@ -24,6 +24,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Forzar HTTPS en producción (evita bloqueo de Mixed Content en Render/Cloud)
+        if (app()->environment('production') || env('APP_ENV') === 'production' || isset($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
+            URL::forceScheme('https');
+        }
+
         // Lógica del CHAT GLOBAL
         // Cada vez que se cargue la plantilla base 'layouts.app', verificamos si hay chat activo en la sesión.
         View::composer('layouts.app', function ($view) {
