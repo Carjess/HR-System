@@ -143,6 +143,7 @@ class MessageController extends Controller
         }
 
         session(['active_chat_user_id' => $user->id]);
+        session()->save();
         
         if ($request->ajax() || $request->wantsJson()) {
             $myId = Auth::id();

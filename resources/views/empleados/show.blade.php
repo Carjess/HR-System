@@ -372,18 +372,21 @@
         // --- FUNCIÓN PARA ABRIR CHAT SIN RECARGAR (AJAX) ---
         async function openChatAsync(userId) {
             try {
-                // 1. Petición al servidor (AJAX)
+                // 1. Limpiar flag de chat cerrado para que el widget pueda abrirse
+                localStorage.removeItem('chat_closed');
+                localStorage.setItem('chat_minimized', 'false');
+
+                // 2. Petición al servidor (AJAX)
                 const response = await fetch(`/chat/open/${userId}`, {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        'X-Requested-With': 'XMLHttpRequest' // Importante para que Laravel sepa que es AJAX
+                        'X-Requested-With': 'XMLHttpRequest'
                     }
                 });
 
                 if (response.ok) {
                     const html = await response.text();
-                    // Intentamos parsear JSON por si el controlador envía JSON
                     let parsedHtml = html;
                     try {
                         const json = JSON.parse(html);
@@ -392,20 +395,24 @@
                         // Si no es JSON, es HTML directo, seguimos
                     }
                     
-                    // 2. Si ya existe un chat abierto, lo quitamos para poner el nuevo
-                    const existingChat = document.querySelector('[x-data="chatWidget()"]');
-                    if (existingChat) {
-                        existingChat.remove();
-                    }
+                    // 3. Remover cualquier widget de chat anterior (por nombre antiguo o nuevo)
+                    document.querySelectorAll('[x-data^="floatingChatWidget"], [x-data^="chatWidget"]').forEach(el => el.remove());
 
-                    // 3. Inyectamos el HTML del widget en el cuerpo de la página
+                    // 4. Inyectar el nuevo HTML del widget en el body
                     const tempContainer = document.createElement('div');
                     tempContainer.innerHTML = parsedHtml;
-                    
                     while (tempContainer.firstChild) {
                         document.body.appendChild(tempContainer.firstChild);
                     }
-                    
+
+                    // 5. Inicializar Alpine en los nuevos nodos
+                    if (window.Alpine) {
+                        document.querySelectorAll('[x-data]').forEach(el => {
+                            if (!el._x_dataStack) {
+                                Alpine.initTree(el);
+                            }
+                        });
+                    }
                 } else {
                     console.error("Error abriendo chat");
                 }

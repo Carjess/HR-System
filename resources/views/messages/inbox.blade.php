@@ -180,6 +180,8 @@
                     if(inboxContainer) inboxContainer.scrollTop = inboxContainer.scrollHeight;
 
                     function popOutChat(userId) {
+                        localStorage.removeItem('chat_closed');
+                        localStorage.setItem('chat_minimized', 'false');
                         fetch(`/chat/open/${userId}`, {
                             method: 'POST',
                             headers: {

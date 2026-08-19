@@ -81,7 +81,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/chat/{user}', [MessageController::class, 'chat'])->name('messages.chat');
     Route::post('/chat/{user}', [MessageController::class, 'store'])->name('messages.store');
     Route::post('/chat/open/{user}', [MessageController::class, 'openChat'])->name('chat.open');
-    Route::post('/chat/close', [MessageController::class, 'closeChat'])->name('chat.close');
+    Route::match(['get', 'post'], '/chat/close', [MessageController::class, 'closeChat'])->name('chat.close');
 
 
     // --- ZONA DE ADMIN (SOLO GESTIÓN) ---

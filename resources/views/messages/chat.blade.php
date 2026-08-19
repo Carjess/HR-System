@@ -27,7 +27,7 @@
 function floatingChatWidget() {
     return {
         isOpen: true,
-        isMinimized: false,
+        isMinimized: true,
         isDragging: false,
         hasMoved: false,
         x: 0,
@@ -37,8 +37,15 @@ function floatingChatWidget() {
         messageBody: '',
 
         init() {
+            // Si el usuario cerró el chat, no mostrarlo
+            if (localStorage.getItem('chat_closed') === 'true') {
+                this.isOpen = false;
+                return;
+            }
+
             const storedMin = localStorage.getItem('chat_minimized');
-            this.isMinimized = storedMin === 'true';
+            // Por defecto inicia minimizado como bola flotante a menos que explícitamente se haya abierto
+            this.isMinimized = storedMin === null ? true : storedMin === 'true';
 
             const storedX = localStorage.getItem('chat_pos_x');
             const storedY = localStorage.getItem('chat_pos_y');
@@ -145,7 +152,8 @@ function floatingChatWidget() {
 
         closeGlobalChat() {
             this.isOpen = false;
-            localStorage.removeItem('chat_minimized');
+            localStorage.setItem('chat_closed', 'true');
+            localStorage.setItem('chat_minimized', 'true');
 
             fetch('{{ route('chat.close') }}', {
                 method: 'POST',
@@ -211,7 +219,10 @@ function floatingChatWidget() {
         <div class="font-bold text-xl pointer-events-none drop-shadow-md">{{ substr($empleado->name, 0, 1) }}</div>
         <span class="absolute bottom-1 right-1 block h-3.5 w-3.5 rounded-full bg-green-400 border-2 border-white pointer-events-none shadow-sm"></span>
         
-        <button @click.stop="closeGlobalChat" 
+        <button type="button" 
+                @click.stop.prevent="closeGlobalChat" 
+                @mousedown.stop
+                @touchstart.stop
                 class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow-md border border-white hover:bg-red-600 z-50 transition-colors"
                 title="Cerrar chat">✕</button>
     </div>
@@ -227,10 +238,10 @@ function floatingChatWidget() {
             </div>
             
             <div class="flex items-center gap-2 relative z-10">
-                <button @click.stop="toggleMinimize" class="hover:bg-blue-500 p-1.5 rounded transition-colors" title="Minimizar">
+                <button type="button" @click.stop.prevent="toggleMinimize" @mousedown.stop @touchstart.stop class="hover:bg-blue-500 p-1.5 rounded transition-colors" title="Minimizar">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
                 </button>
-                <button @click.stop="closeGlobalChat" class="hover:bg-red-500 p-1.5 rounded transition-colors" title="Cerrar conversación">
+                <button type="button" @click.stop.prevent="closeGlobalChat" @mousedown.stop @touchstart.stop class="hover:bg-red-500 p-1.5 rounded transition-colors" title="Cerrar conversación">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
