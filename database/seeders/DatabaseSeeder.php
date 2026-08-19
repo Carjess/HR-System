@@ -114,7 +114,6 @@ class DatabaseSeeder extends Seeder
                 'telefono' => '+1 809 555 0101',
                 'direccion' => 'Torre Empresarial, Piso 10',
                 'fecha_contratacion' => Carbon::now()->subYears(2),
-                'is_active' => true,
                 'email_verified_at' => now(),
             ]
         );
@@ -139,7 +138,6 @@ class DatabaseSeeder extends Seeder
                 'telefono' => '+1 809 555 0202',
                 'direccion' => 'Av. Principal #45',
                 'fecha_contratacion' => Carbon::now()->subYear(),
-                'is_active' => true,
                 'email_verified_at' => now(),
             ]
         );
@@ -164,7 +162,6 @@ class DatabaseSeeder extends Seeder
                 'telefono' => '+1 809 555 0303',
                 'direccion' => 'Calle Las Palmas #12',
                 'fecha_contratacion' => Carbon::now()->subMonths(8),
-                'is_active' => true,
                 'email_verified_at' => now(),
             ]
         );
@@ -189,7 +186,6 @@ class DatabaseSeeder extends Seeder
                 'telefono' => '+1 809 555 0404',
                 'direccion' => 'Urb. El Rosal, Casa #8',
                 'fecha_contratacion' => Carbon::now()->subMonths(5),
-                'is_active' => true,
                 'email_verified_at' => now(),
             ]
         );
@@ -214,7 +210,6 @@ class DatabaseSeeder extends Seeder
                 'telefono' => '+1 809 555 0505',
                 'direccion' => 'Residencial San Carlos #21',
                 'fecha_contratacion' => Carbon::now()->subMonths(3),
-                'is_active' => true,
                 'email_verified_at' => now(),
             ]
         );

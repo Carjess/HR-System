@@ -125,7 +125,6 @@ class User extends Authenticatable
         'direccion',
         'fecha_contratacion',
         'position_id',
-        'is_active'
     ];
 
     /**
@@ -149,7 +148,6 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'fecha_contratacion' => 'date',
-            'is_active' => 'boolean',
         ];
     }
 
