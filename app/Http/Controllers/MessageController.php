@@ -20,30 +20,29 @@ class MessageController extends Controller
         $filter = $request->query('filter', 'all');
         $search = $request->query('search');
         
-        // === LÓGICA PARA ADMINISTRADORES ===
-        if ($user->role === 'admin') {
-            // Query Base: Empleados que tienen mensajes
-            $contactsQuery = User::where('role', '!=', 'admin')
-                ->where(function($query) {
-                    $query->whereHas('sentMessages')->orWhereHas('receivedMessages');
-                });
+        // Base: Todos los demás usuarios del sistema
+        $contactsQuery = User::where('id', '!=', $user->id);
 
-            // Filtro "Mis Chats"
+        // Lógica de filtrado
+        if ($user->role === 'admin') {
             if ($filter === 'mine') {
+                // Chats donde yo he participado directamente
                 $contactsQuery->where(function($q) use ($user) {
-                    $q->whereHas('receivedMessages', fn($sq) => $sq->where('sender_id', $user->id))
-                      ->orWhereHas('sentMessages', fn($sq) => $sq->where('receiver_id', $user->id));
+                    $q->whereHas('sentMessages', fn($sq) => $sq->where('receiver_id', $user->id))
+                      ->orWhereHas('receivedMessages', fn($sq) => $sq->where('sender_id', $user->id));
+                });
+            } else {
+                // Todos: cualquier usuario que tenga mensajes en el sistema
+                $contactsQuery->where(function($q) {
+                    $q->whereHas('sentMessages')->orWhereHas('receivedMessages');
                 });
             }
-        } 
-        // === LÓGICA PARA EMPLEADOS (JESÚS) ===
-        else {
-            // Query Base: Mostrar solo Administradores con los que he hablado
-            $contactsQuery = User::where('role', 'admin')
-                ->where(function($q) use ($user) {
-                     $q->whereHas('receivedMessages', fn($sq) => $sq->where('sender_id', $user->id))
-                       ->orWhereHas('sentMessages', fn($sq) => $sq->where('receiver_id', $user->id));
-                });
+        } else {
+            // Empleados: mostrar con quién han conversado
+            $contactsQuery->where(function($q) use ($user) {
+                $q->whereHas('sentMessages', fn($sq) => $sq->where('receiver_id', $user->id))
+                  ->orWhereHas('receivedMessages', fn($sq) => $sq->where('sender_id', $user->id));
+            });
         }
 
         // Buscador general
@@ -52,7 +51,11 @@ class MessageController extends Controller
         }
 
         // Ejecutar consulta de contactos
-        $employees = $contactsQuery->with(['sentMessages' => fn($q) => $q->latest()->limit(1), 'receivedMessages' => fn($q) => $q->latest()->limit(1)])->get();
+        $employees = $contactsQuery->with([
+            'position.department',
+            'sentMessages' => fn($q) => $q->latest()->limit(1),
+            'receivedMessages' => fn($q) => $q->latest()->limit(1)
+        ])->get();
 
         // Ordenar por mensaje más reciente
         $employees = $employees->sortByDesc(function($u) {
@@ -68,17 +71,12 @@ class MessageController extends Controller
         if ($request->has('user_id')) {
             $otherUser = User::find($request->user_id);
             
-            // Seguridad Extra: Si soy empleado, solo puedo cargar chats con Admins
-            if ($user->role !== 'admin' && $otherUser->role !== 'admin') {
-                abort(403);
-            }
-
             if ($otherUser) {
                 $selectedConversation = $otherUser;
-                // Marcar leídos
+                // Marcar mensajes recibidos como leídos
                 Message::where('sender_id', $otherUser->id)->where('receiver_id', $user->id)->update(['is_read' => true]);
                 
-                // Cargar mensajes
+                // Cargar mensajes entre ambos usuarios
                 $messages = Message::where(function($q) use ($user, $otherUser) {
                     $q->where('sender_id', $user->id)->where('receiver_id', $otherUser->id);
                 })->orWhere(function($q) use ($user, $otherUser) {

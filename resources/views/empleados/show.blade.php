@@ -372,7 +372,7 @@
         // --- FUNCIÓN PARA ABRIR CHAT SIN RECARGAR (AJAX) ---
         async function openChatAsync(userId) {
             try {
-                // 1. Limpiar flag de chat cerrado para que el widget pueda abrirse
+                // 1. Limpiar flags para abrir expandido
                 localStorage.removeItem('chat_closed');
                 localStorage.setItem('chat_minimized', 'false');
 
@@ -381,36 +381,36 @@
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        'X-Requested-With': 'XMLHttpRequest'
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
                     }
                 });
 
                 if (response.ok) {
-                    const html = await response.text();
-                    let parsedHtml = html;
-                    try {
-                        const json = JSON.parse(html);
-                        if (json.html) parsedHtml = json.html;
-                    } catch(e) {
-                        // Si no es JSON, es HTML directo, seguimos
-                    }
+                    const data = await response.json();
+                    const html = data.html || data;
                     
-                    // 3. Remover cualquier widget de chat anterior (por nombre antiguo o nuevo)
-                    document.querySelectorAll('[x-data^="floatingChatWidget"], [x-data^="chatWidget"]').forEach(el => el.remove());
+                    // 3. Remover cualquier widget de chat anterior
+                    document.querySelectorAll('[x-data^="floatingChatWidget"], [x-data^="chatWidget"], #global-dynamic-chat-holder').forEach(el => el.remove());
 
-                    // 4. Inyectar el nuevo HTML del widget en el body
+                    // 4. Inyectar el nuevo HTML del widget
                     const tempContainer = document.createElement('div');
-                    tempContainer.innerHTML = parsedHtml;
-                    while (tempContainer.firstChild) {
-                        document.body.appendChild(tempContainer.firstChild);
-                    }
+                    tempContainer.id = 'global-dynamic-chat-holder';
+                    tempContainer.innerHTML = html;
+                    document.body.appendChild(tempContainer);
 
-                    // 5. Inicializar Alpine en los nuevos nodos
+                    // 5. Ejecutar scripts internos para que floatingChatWidget() exista
+                    tempContainer.querySelectorAll('script').forEach(oldScript => {
+                        const newScript = document.createElement('script');
+                        Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                        newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                        oldScript.parentNode.replaceChild(newScript, oldScript);
+                    });
+
+                    // 6. Inicializar Alpine en el nuevo árbol
                     if (window.Alpine) {
-                        document.querySelectorAll('[x-data]').forEach(el => {
-                            if (!el._x_dataStack) {
-                                Alpine.initTree(el);
-                            }
+                        tempContainer.querySelectorAll('[x-data]').forEach(el => {
+                            Alpine.initTree(el);
                         });
                     }
                 } else {

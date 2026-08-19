@@ -229,15 +229,21 @@ class DatabaseSeeder extends Seeder
         Message::firstOrCreate([
             'sender_id' => $empleado1->id,
             'receiver_id' => $admin->id,
-            'content' => '¡Hola Administrador! Ya subí los nuevos diseños de la interfaz para su revisión.',
-            'read_at' => null,
+            'body' => '¡Hola Administrador! Ya subí los nuevos diseños de la interfaz para su revisión.',
+        ], [
+            'subject' => 'Ticket #1001',
+            'is_read' => false,
+            'allow_reply' => true,
         ]);
 
         Message::firstOrCreate([
             'sender_id' => $supervisor->id,
             'receiver_id' => $admin->id,
-            'content' => 'Hola, acabo de aprobar las horas de la nómina de esta quincena.',
-            'read_at' => now(),
+            'body' => 'Hola, acabo de aprobar las horas de la nómina de esta quincena.',
+        ], [
+            'subject' => 'Ticket #1002',
+            'is_read' => true,
+            'allow_reply' => true,
         ]);
     }
 }
