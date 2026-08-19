@@ -1,16 +1,14 @@
 #!/bin/bash
 set -e
 
-# Crear enlace simbólico de storage
+# 1. Crear enlace simbólico de storage
 php artisan storage:link --force || true
 
-# Ejecutar migraciones si la base de datos está configurada
-if [ -n "$DB_HOST" ]; then
-    echo "Ejecutando migraciones de base de datos..."
-    php artisan migrate --force || true
-fi
+# 2. Ejecutar migraciones de base de datos
+echo "Ejecutando migraciones de base de datos..."
+php artisan migrate --force || true
 
-# Optimizar cachés de Laravel para producción
+# 3. Optimizar cachés de Laravel para producción
 php artisan config:cache || true
 php artisan route:cache || true
 php artisan view:cache || true
