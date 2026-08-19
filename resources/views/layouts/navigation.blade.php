@@ -3,21 +3,16 @@
     Diseño: Fondo Blanco Limpio con Acentos Verde Petróleo (#315762)
     Funcionalidad: Colapsable. Footer con MENÚ DE CONFIGURACIÓN.
 -->
-<aside :class="[
-            sidebarOpen ? 'w-64' : 'w-20',
-            isSidebarReady ? 'transition-all duration-300 ease-in-out' : ''
-       ]" 
-       class="flex flex-col flex-shrink-0 h-full bg-white dark:bg-gray-900 z-20 shadow-xl border-r border-gray-100 dark:border-gray-800 transition-colors duration-300"> 
+<aside id="sidebar"
+       :class="sidebarOpen ? 'w-64' : 'w-20'" 
+       class="flex flex-col flex-shrink-0 h-full bg-white dark:bg-gray-900 z-20 shadow-xl border-r border-gray-100 dark:border-gray-800 transition-all duration-300 ease-in-out"> 
     
     <!-- 1. CABECERA (LOGO Y BOTÓN) -->
-    <div class="flex items-center h-20 px-4 overflow-hidden bg-white dark:bg-gray-900 transition-colors duration-300"
-         :class="[
-            sidebarOpen ? 'justify-between' : 'justify-center',
-            isSidebarReady ? 'transition-all duration-300' : ''
-         ]">
+    <div class="sidebar-header-box flex items-center h-20 px-4 overflow-hidden bg-white dark:bg-gray-900 transition-colors duration-300"
+         :class="sidebarOpen ? 'justify-between' : 'justify-center'">
         
         <!-- Logo / Nombre -->
-        <div class="flex items-center justify-center w-full" x-show="sidebarOpen" x-transition.opacity.duration.200ms>
+        <div class="sidebar-label flex items-center justify-center w-full" x-show="sidebarOpen" x-cloak>
             <a href="{{ route('dashboard') }}" class="block">
                 <img src="{{ asset('img/rh_green.png') }}" 
                      alt="Logo HR-System" 
@@ -41,107 +36,92 @@
     <!-- 2. MENÚ DE NAVEGACIÓN -->
     <div class="flex-1 flex flex-col overflow-y-auto px-3 py-6 space-y-2 custom-scrollbar">
         
-        <p x-show="sidebarOpen" x-transition class="px-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2 mt-1">Principal</p>
+        <p x-show="sidebarOpen" x-cloak class="sidebar-label px-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2 mt-1">Principal</p>
 
         <!-- DASHBOARD -->
         <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard') || request()->routeIs('employee.portal')" x-bind:class="sidebarOpen ? '' : 'justify-center'">
             <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-            <span x-show="sidebarOpen" x-cloak class="ml-3 font-medium whitespace-nowrap">Inicio</span>
+            <span x-show="sidebarOpen" x-cloak class="sidebar-label ml-3 font-medium whitespace-nowrap">Inicio</span>
         </x-nav-link>
 
         <!-- MENSAJERÍA -->
         <x-nav-link :href="route('messages.inbox')" :active="request()->routeIs('messages.*')" x-bind:class="sidebarOpen ? '' : 'justify-center'">
             <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
-            <span x-show="sidebarOpen" x-cloak class="ml-3 font-medium whitespace-nowrap">Mensajería</span>
+            <span x-show="sidebarOpen" x-cloak class="sidebar-label ml-3 font-medium whitespace-nowrap">Mensajería</span>
         </x-nav-link>
 
         <!-- CALENDARIO -->
         <x-nav-link :href="route('calendar.index')" :active="request()->routeIs('calendar.*')" x-bind:class="sidebarOpen ? '' : 'justify-center'">
             <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-            <span x-show="sidebarOpen" x-cloak class="ml-3 font-medium whitespace-nowrap">Calendario</span>
+            <span x-show="sidebarOpen" x-cloak class="sidebar-label ml-3 font-medium whitespace-nowrap">Calendario</span>
         </x-nav-link>
 
         <!-- ZONA ADMIN -->
         @can('is-admin')
-            <div x-show="sidebarOpen" class="my-4 border-t border-gray-100 dark:border-gray-800"></div>
-            <p x-show="sidebarOpen" x-transition class="px-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Gestión</p>
+            <div x-show="sidebarOpen" x-cloak class="sidebar-label my-4 border-t border-gray-100 dark:border-gray-800"></div>
+            <p x-show="sidebarOpen" x-cloak class="sidebar-label px-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Gestión</p>
 
             <x-nav-link :href="route('empleados.index')" :active="request()->routeIs('empleados.*')" x-bind:class="sidebarOpen ? '' : 'justify-center'">
                 <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                <span x-show="sidebarOpen" x-cloak class="ml-3 font-medium whitespace-nowrap">Empleados</span>
+                <span x-show="sidebarOpen" x-cloak class="sidebar-label ml-3 font-medium whitespace-nowrap">Empleados</span>
             </x-nav-link>
 
             <x-nav-link :href="route('ausencias.index')" :active="request()->routeIs('ausencias.*')" x-bind:class="sidebarOpen ? '' : 'justify-center'">
                 <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                <span x-show="sidebarOpen" x-cloak class="ml-3 font-medium whitespace-nowrap">Ausencias </span>
+                <span x-show="sidebarOpen" x-cloak class="sidebar-label ml-3 font-medium whitespace-nowrap">Ausencias</span>
             </x-nav-link>
 
             <x-nav-link :href="route('payroll.index')" :active="request()->routeIs('payroll.*')" x-bind:class="sidebarOpen ? '' : 'justify-center'">
                 <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                <span x-show="sidebarOpen" x-cloak class="ml-3 font-medium whitespace-nowrap">Nómina</span>
+                <span x-show="sidebarOpen" x-cloak class="sidebar-label ml-3 font-medium whitespace-nowrap">Nómina</span>
             </x-nav-link>
 
-            <div x-show="sidebarOpen" class="my-4 border-t border-gray-100 dark:border-gray-800"></div>
-            <p x-show="sidebarOpen" x-transition class="px-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Admin</p>
+            <div x-show="sidebarOpen" x-cloak class="sidebar-label my-4 border-t border-gray-100 dark:border-gray-800"></div>
+            <p x-show="sidebarOpen" x-cloak class="sidebar-label px-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Admin</p>
 
             <x-nav-link :href="route('departamentos.index')" :active="request()->routeIs('departamentos.*')" x-bind:class="sidebarOpen ? '' : 'justify-center'">
                 <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-3a1 1 0 011-1h2a1 1 0 011 1v3m-5-10v-3a1 1 0 011-1h2a1 1 0 011 1v3"></path></svg>
-                <span x-show="sidebarOpen" x-cloak class="ml-3 font-medium whitespace-nowrap">Deptos</span>
+                <span x-show="sidebarOpen" x-cloak class="sidebar-label ml-3 font-medium whitespace-nowrap">Deptos</span>
             </x-nav-link>
 
             <x-nav-link :href="route('tipos-contrato.index')" :active="request()->routeIs('tipos-contrato.*')" x-bind:class="sidebarOpen ? '' : 'justify-center'">
                 <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                <span x-show="sidebarOpen" x-cloak class="ml-3 font-medium whitespace-nowrap">Contratos</span>
+                <span x-show="sidebarOpen" x-cloak class="sidebar-label ml-3 font-medium whitespace-nowrap">Contratos</span>
             </x-nav-link>
         @endcan
         
         <!-- ZONA EMPLEADO -->
         @if(auth()->user()->role === 'employee' || !auth()->user()->can('is-admin'))
-            <div x-show="sidebarOpen" class="my-4 border-t border-gray-100 dark:border-gray-800"></div>
-            <p x-show="sidebarOpen" x-transition class="px-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Personal</p>
+            <div x-show="sidebarOpen" x-cloak class="sidebar-label my-4 border-t border-gray-100 dark:border-gray-800"></div>
+            <p x-show="sidebarOpen" x-cloak class="sidebar-label px-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Personal</p>
 
-            <!-- NUEVA SECCIÓN: MIS AUSENCIAS -->
-            <!-- Nota: Asumo la ruta 'empleados.ausencias'. Debes crearla en web.php apuntando a una función index en EmployeeController -->
             <x-nav-link :href="route('empleados.ausencias.list', auth()->user()->id)" :active="request()->routeIs('empleados.ausencias.*')" x-bind:class="sidebarOpen ? '' : 'justify-center'">
                 <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                <span x-show="sidebarOpen" x-cloak class="ml-3 font-medium whitespace-nowrap">Mis Ausencias</span>
+                <span x-show="sidebarOpen" x-cloak class="sidebar-label ml-3 font-medium whitespace-nowrap">Mis Ausencias</span>
             </x-nav-link>
 
-          
-            <!-- NUEVA SECCIÓN: MIS RECIBOS -->
             <x-nav-link :href="route('empleados.recibos.list', auth()->user()->id)" :active="request()->routeIs('empleados.recibos.*')" x-bind:class="sidebarOpen ? '' : 'justify-center'">
                 <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                <span x-show="sidebarOpen" x-cloak class="ml-3 font-medium whitespace-nowrap">Mis Recibos</span>
+                <span x-show="sidebarOpen" x-cloak class="sidebar-label ml-3 font-medium whitespace-nowrap">Mis Recibos</span>
             </x-nav-link>
 
-            <!-- MI PERFIL -->
             <x-nav-link :href="route('empleados.show', auth()->user()->id)" :active="request()->routeIs('empleados.show')" x-bind:class="sidebarOpen ? '' : 'justify-center'">
                 <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                <span x-show="sidebarOpen" x-cloak class="ml-3 font-medium whitespace-nowrap">Mi Perfil</span>
+                <span x-show="sidebarOpen" x-cloak class="sidebar-label ml-3 font-medium whitespace-nowrap">Mi Perfil</span>
             </x-nav-link>
-            
         @endif
 
     </div>
     
     <!-- 3. FOOTER DEL SIDEBAR (CONFIGURACIÓN) -->
-    <!-- CORRECCIÓN: El menú flotante ahora tiene clases dinámicas para posicionarse bien -->
     <div class="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 transition-colors duration-300 relative" 
          x-data="{ configOpen: false }">
         
         <!-- MENÚ FLOTANTE DE CONFIGURACIÓN -->
         <div x-show="configOpen" 
+             x-cloak
              @click.away="configOpen = false"
-             x-transition:enter="transition ease-out duration-100"
-             x-transition:enter-start="opacity-0 transform scale-95"
-             x-transition:enter-end="opacity-100 transform scale-100"
-             x-transition:leave="transition ease-in duration-75"
-             x-transition:leave-start="opacity-100 transform scale-100"
-             x-transition:leave-end="opacity-0 transform scale-95"
-             
-             /* CLASE DINÁMICA: Si sidebarOpen, arriba. Si cerrado, a la derecha */
              :class="sidebarOpen ? 'bottom-full left-4 right-4 mb-2 w-auto' : 'left-full bottom-2 ml-3 w-56'"
-             
              class="absolute bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-700 overflow-hidden z-50">
             
             <div class="p-2 space-y-1">
@@ -166,15 +146,12 @@
             </div>
         </div>
 
-        
-            
-            <!-- BOTÓN PRINCIPAL (ENGRANAJE REAL) -->
+        <!-- BOTÓN PRINCIPAL (ENGRANAJE REAL) -->
         <button @click="configOpen = !configOpen" 
-                class="flex items-center w-full p-2.5 rounded-xl transition-colors duration-200 group hover:bg-white dark:hover:bg-gray-800 hover:shadow-sm hover:border-gray-200 dark:hover:border-gray-700"
+                class="sidebar-btn flex items-center w-full p-2.5 rounded-xl transition-colors duration-200 group hover:bg-white dark:hover:bg-gray-800 hover:shadow-sm hover:border-gray-200 dark:hover:border-gray-700"
                 :class="sidebarOpen ? '' : 'justify-center'"
                 title="Configuración">
             
-            <!-- Icono Engranaje SVG Estándar -->
             <div class="text-gray-500 group-hover:text-primary-600 dark:text-gray-400 dark:group-hover:text-primary-400 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear w-6 h-6" viewBox="0 0 16 16">
                     <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
@@ -182,11 +159,11 @@
                 </svg>
             </div>
 
-            <div class="flex-1 min-w-0 text-left ml-3" x-show="sidebarOpen" x-cloak>
+            <div class="sidebar-label flex-1 min-w-0 text-left ml-3" x-show="sidebarOpen" x-cloak>
                 <p class="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-primary-600 dark:group-hover:text-white transition-colors">Configuración</p>
             </div>
             
-            <div class="text-gray-400" x-show="sidebarOpen" x-cloak>
+            <div class="sidebar-label text-gray-400" x-show="sidebarOpen" x-cloak>
                 <svg class="w-4 h-4 transform transition-transform duration-200" :class="configOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
             </div>
         </button>

@@ -15,30 +15,60 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <!-- Estilo para x-cloak -->
+    <!-- Estilo para x-cloak y anti-parpadeo del Sidebar -->
     <style>
         [x-cloak] {
             display: none !important;
         }
+
+        /* 1. ESTADO COLAPSADO (Puro CSS instantáneo, 0ms flicker) */
+        html.sidebar-collapsed #sidebar {
+            width: 5rem !important; /* 80px */
+        }
+        html.sidebar-collapsed .sidebar-label {
+            display: none !important;
+        }
+        html.sidebar-collapsed #sidebar .sidebar-header-box {
+            justify-content: center !important;
+        }
+        html.sidebar-collapsed #sidebar a,
+        html.sidebar-collapsed #sidebar button.sidebar-btn {
+            justify-content: center !important;
+        }
+
+        /* 2. ESTADO EXPANDIDO (Ancho cómodo de 16rem / 256px o 18rem si se desea) */
+        html:not(.sidebar-collapsed) #sidebar {
+            width: 16rem !important; /* 256px (w-64) */
+        }
+        html:not(.sidebar-collapsed) #sidebar .sidebar-header-box {
+            justify-content: space-between !important;
+        }
+
+        /* 3. Desactivar transiciones durante la carga de la página para evitar parpadeos */
+        .preload,
+        .preload * {
+            transition: none !important;
+        }
     </style>
 
-    <!-- SCRIPT DE INICIALIZACIÓN DEL MODO OSCURO (Evita FOUC - Flash of Unstyled Content) -->
+    <!-- SCRIPT DE INICIALIZACIÓN TEMPRANA (Evita FOUC de Tema y Sidebar) -->
     <script>
+        // 1. Tema
         if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
         } else {
             document.documentElement.classList.remove('dark');
         }
+
+        // 2. Sidebar (Lectura síncrona antes del primer render)
+        if (localStorage.getItem('sidebarOpen') === 'false') {
+            document.documentElement.classList.add('sidebar-collapsed');
+        }
     </script>
 </head>
 
-<!-- 
-        Agregamos la lógica de 'darkMode' y 'toggleTheme' al x-data global 
-    -->
-
 <body class="font-sans antialiased bg-gray-50 dark:bg-gray-900 transition-colors duration-300" x-data="{ 
-              sidebarOpen: localStorage.getItem('sidebarOpen') ? localStorage.getItem('sidebarOpen') === 'true' : true,
-              isSidebarReady: false,
+              sidebarOpen: localStorage.getItem('sidebarOpen') !== 'false',
               darkMode: localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches),
               toggleTheme() {
                   this.darkMode = !this.darkMode;
@@ -51,7 +81,14 @@
                   }
               }
           }"
-    x-init="$watch('sidebarOpen', val => localStorage.setItem('sidebarOpen', val)); setTimeout(() => isSidebarReady = true, 300)">
+    x-init="$watch('sidebarOpen', val => {
+        localStorage.setItem('sidebarOpen', val);
+        if (val) {
+            document.documentElement.classList.remove('sidebar-collapsed');
+        } else {
+            document.documentElement.classList.add('sidebar-collapsed');
+        }
+    })">
 
     <div class="flex h-screen overflow-hidden">
 
