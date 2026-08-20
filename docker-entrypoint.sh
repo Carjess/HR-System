@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 # 1. Crear enlace simbólico de storage
 php artisan storage:link --force || true
@@ -17,12 +16,13 @@ php artisan config:cache || true
 php artisan route:cache || true
 php artisan view:cache || true
 
-echo "Laravel listo. Iniciando Apache en el puerto ${PORT:-80}..."
-
-# Ajustar puerto dinámico de Render si viene especificado en la variable $PORT
-if [ -n "$PORT" ]; then
-    sed -i "s/80/$PORT/g" /etc/apache2/ports.conf /etc/apache2/sites-available/*.conf
+# 5. Configurar puertos para Render (soporta tanto Port 80 como $PORT dinámico)
+if [ -n "$PORT" ] && [ "$PORT" != "80" ]; then
+    echo "Listen $PORT" >> /etc/apache2/ports.conf 2>/dev/null || true
+    sed -i "s/<VirtualHost \*:80>/<VirtualHost *:$PORT *:80>/g" /etc/apache2/sites-available/*.conf 2>/dev/null || true
 fi
 
-# Arrancar Apache
+echo "Laravel listo. Iniciando servidor Apache..."
+
+# Arrancar Apache siempre
 exec apache2-foreground
