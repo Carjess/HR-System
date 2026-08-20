@@ -16,13 +16,19 @@ php artisan config:cache || true
 php artisan route:cache || true
 php artisan view:cache || true
 
-# 5. Configurar puertos para Render (soporta tanto Port 80 como $PORT dinámico)
+# 5. Configurar puertos para Render
+# Si Render asigna un puerto en $PORT, hacemos que Apache escuche en ese puerto
 if [ -n "$PORT" ] && [ "$PORT" != "80" ]; then
-    echo "Listen $PORT" >> /etc/apache2/ports.conf 2>/dev/null || true
-    sed -i "s/<VirtualHost \*:80>/<VirtualHost *:$PORT *:80>/g" /etc/apache2/sites-available/*.conf 2>/dev/null || true
+    echo "Listen $PORT" >> /etc/apache2/ports.conf
 fi
 
-echo "Laravel listo. Iniciando servidor Apache..."
+# Hacer que el VirtualHost acepte cualquier puerto en el que escuche Apache
+sed -i 's/<VirtualHost \*:80>/<VirtualHost *:*>/g' /etc/apache2/sites-available/*.conf 2>/dev/null || true
 
-# Arrancar Apache siempre
+echo "Comprobando sintaxis de Apache..."
+apache2ctl -t || true
+
+echo "Laravel listo. Iniciando Apache en primer plano..."
+
+# Arrancar Apache
 exec apache2-foreground
